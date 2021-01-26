@@ -21,6 +21,7 @@ EOSC-Nordic SH matching service preparations
     ```
 
 3. Create input, output and working data directories
+    ```console
     mkdir userdir
     mkdir indata
     mkdir outdata
