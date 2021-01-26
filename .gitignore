@@ -1,0 +1,10 @@
+*.pyc
+*.log
+.DS_Store
+env/
+run_initial_data.sh
+sh_matching_analysis/data/
+sh_matching_analysis/programs/
+sh_matching_analysis/scripts_initial_data/
+usearch11.0.667_i86linux32
+

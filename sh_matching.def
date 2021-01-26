@@ -1,0 +1,74 @@
+# A base Ubuntu 20 Singularity container with basic Python packages
+
+BootStrap: library
+From: ubuntu:20.04
+
+%help
+A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3 and biopython
+
+%post
+    # Some package only available in "universe" repo
+    apt install -y software-properties-common
+    add-apt-repository universe
+
+    apt update
+    apt upgrade
+
+    apt install -y python3  # Python 3.8
+    apt install -y python3-pip
+    apt install -y zip
+    apt install -y unzip
+    apt install -y curl
+    apt install -y hmmer
+    apt install -y wget
+
+    # biopython
+    pip3 install --no-cache-dir --upgrade biopython==1.76
+
+    chmod 0111 /sh_matching/programs/usearch
+
+    # vsearch 2.14.1
+    apt install -y vsearch
+    # wget https://github.com/torognes/vsearch/releases/download/v2.14.2/vsearch-2.14.2-linux-x86_64.tar.gz
+
+    wget https://microbiology.se/sw/ITSx_1.1.2.tar.gz
+    tar -xzvf ITSx_1.1.2.tar.gz
+    mv ITSx_1.1.2 /sh_matching/programs/ITSx
+    rm ITSx_1.1.2.tar.gz
+
+    # TODO - apt install ncbi-blast+  (2.9.x)
+    wget https://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz
+    tar -xzvf blast-2.2.26-x64-linux.tar.gz
+    mv blast-2.2.26 /sh_matching/programs/
+    rm blast-2.2.26-x64-linux.tar.gz
+
+    # Mothur version=1.42.1 - Release Date=05/12/2020
+    apt install -y mothur
+    # wget https://github.com/mothur/mothur/releases/download/v.1.44.1/Mothur.linux.zip
+
+    # Installing Krona
+    wget https://github.com/marbl/Krona/releases/download/v2.7.1/KronaTools-2.7.1.tar
+    tar -xvf KronaTools-2.7.1.tar -C /sh_matching/programs/
+    cd /sh_matching/programs/KronaTools-2.7.1/
+    perl install.pl --prefix ../krona
+    cd /
+
+    # Get database files (https://plutof.ut.ee/#/filerepository/view/3576414)
+    wget https://files.plutof.ut.ee/public/orig/E4/7C/E47CE4EEBC48A22618FBDF07218E4EC8DC32170CE75D55914765FBF3CA455CB2.zip
+    mv E47CE4EEBC48A22618FBDF07218E4EC8DC32170CE75D55914765FBF3CA455CB2.zip sh_matching_data_0_5.zip
+    unzip sh_matching_data_0_5.zip -d /sh_matching/
+    rm sh_matching_data_0_5.zip
+
+%environment
+    export LC_ALL=C
+
+%runscript
+    exec "$@"
+
+%labels
+    Author kessya
+
+%files
+    usearch11.0.667_i86linux32 /sh_matching/programs/usearch
+    sh_matching_analysis/run_pipeline.sh /sh_matching/run_pipeline.sh
+    sh_matching_analysis/scripts/* /sh_matching/scripts
