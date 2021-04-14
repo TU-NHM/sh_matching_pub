@@ -10,12 +10,17 @@ from Bio import SeqIO
 
 parser = argparse.ArgumentParser(description="Script to format ITSx output (fungi)")
 parser.add_argument("run_id", help="Need run id in numeric format!")
+parser.add_argument("region", help="Need region (either its2 or itsfull)!")
 args = parser.parse_args()
 
 # read in args
 run_id = args.run_id
 if not run_id.isdigit():
     raise ValueError("Run id is not numeric", run_id)
+
+region = args.region
+if not region == "its2" and not region == "itsfull":
+    raise ValueError("Region is not one of: its2, itsfull", region)
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 itsx_dir = user_dir / "ITSx"
@@ -38,21 +43,37 @@ full_seq_dict = {}
 full_counter = 0
 full_new_counter = 0  # TODO - doesn't seem to be used
 its2_counter = 0
+len_limit = 140
 
 # read in ITS positions (to make sure that ITS1, 5.8S and ITS2 regions are all found, but may just be too short)
 # open excluded seq file
-with open(ex_file, "a") as ex, open(pos_file) as pos:
-    # TODO - csv.DictReader would be nice
-    dataReader_pos = csv.reader(pos, delimiter="\t")
-    for row in dataReader_pos:
-        if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-            chim_match = re.search("Chimeric!", row[7])
-            if not chim_match:
-                positions_dict[row[0]] = 1
-                len_fields = row[1].split(" ")
-                length_dict[row[0]] = int(len_fields[0])
-            else:
-                ex.write(f"{row[0]}\tPRINT_FAS\tChimeric according to ITSx.\n")
+if region == "itsfull":
+    with open(ex_file, "a") as ex, open(pos_file) as pos:
+        # TODO - csv.DictReader would be nice
+        dataReader_pos = csv.reader(pos, delimiter="\t")
+        for row in dataReader_pos:
+            if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                chim_match = re.search("Chimeric!", row[7])
+                if not chim_match:
+                    positions_dict[row[0]] = 1
+                    len_fields = row[1].split(" ")
+                    length_dict[row[0]] = int(len_fields[0])
+                else:
+                    ex.write(f"{row[0]}\tPRINT_FAS\tChimeric according to ITSx.\n")
+elif region == "its2":
+    len_limit = 100
+    with open(ex_file, "a") as ex, open(pos_file) as pos:
+        # TODO - csv.DictReader would be nice
+        dataReader_pos = csv.reader(pos, delimiter="\t")
+        for row in dataReader_pos:
+            if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                chim_match = re.search("Chimeric!", row[7])
+                if not chim_match:
+                    positions_dict[row[0]] = 1
+                    len_fields = row[1].split(" ")
+                    length_dict[row[0]] = int(len_fields[0])
+                else:
+                    ex.write(f"{row[0]}\tPRINT_FAS\tChimeric according to ITSx.\n")
 
 with open(full_file, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
@@ -67,13 +88,13 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile, "r") as han
         name_fields = name.split("|")
         record_id = name_fields[0]
         if record_id in positions_dict:
-            if length_dict[record_id] >= 140:
-                if record_id in full_seq_dict and len(full_seq_dict[record_id]) >= 140:
+            if length_dict[record_id] >= len_limit:
+                if record_id in full_seq_dict and len(full_seq_dict[record_id]) >= len_limit:
                     o.write(f">{record_id}\n")
                     o.write(f"{full_seq_dict[record_id]}\n")
                     full_counter += 1
                 else:
-                    if len(str(record.seq)) >= 140:
+                    if len(str(record.seq)) >= len_limit:
                         o.write(f">{record_id}\n")
                         o.write(f"{record.seq}\n")
                         its2_counter += 1

@@ -14,6 +14,12 @@ fi
 
 # get run id
 run_id=$1
+region=$2
+
+if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
+  echo "Region = itsfull"
+  $region = "itsfull"
+fi
 
 # get working directory
 pwd=$(pwd)
@@ -69,8 +75,8 @@ mv itsx_sh_out_o* ITSx_o/
 popd
 
 # parse ITSx output
-python3 "$script_dir/print_out_fasta.py" "$run_id"
-python3 "$script_dir/print_out_fasta_o.py" "$run_id"
+python3 "$script_dir/print_out_fasta.py" "$run_id" "$region"
+python3 "$script_dir/print_out_fasta_o.py" "$run_id" "$region"
 cat "$user_dir/seqs_out_1.fasta" "$user_dir/seqs_out_2.fasta" > "$user_dir/seqs_out.fasta"
 
 # Chimera filtering using uchime and vsearch tools
@@ -82,7 +88,7 @@ vsearch -usearch_global seqs_out.fasta -db "$data_dir/sanger_refs_sh_full.unique
 popd
 
 # handle all potentially chimeric sequences from uchime and usearch_global
-python3 "$script_dir/exclude_chims.py" "$run_id"
+python3 "$script_dir/exclude_chims.py" "$run_id" "$region"
 
 # Additional quality controls - Remove low quality sequences (too short or with too many non-IUPAC symbols)
 python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
