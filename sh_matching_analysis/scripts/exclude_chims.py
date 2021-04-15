@@ -9,12 +9,17 @@ from Bio import SeqIO
 
 parser = argparse.ArgumentParser(description="Script to exclude chimeras identified by uchime and vsearch")
 parser.add_argument("run_id", help="Need run id in numeric format!")
+parser.add_argument("region", help="Need region (either its2 or itsfull)!")
 args = parser.parse_args()
 
 # read in args
 run_id = args.run_id
 if not run_id.isdigit():
     raise ValueError("Run id is not numeric", run_id)
+
+region = args.region
+if not region == "its2" and not region == "itsfull":
+    raise ValueError("Region is not one of: its2, itsfull", region)
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 global_infile = user_dir / "usearch_global.full.75.blast6out.txt"
@@ -32,6 +37,12 @@ nohit_counter = 0
 nogo_counter = 0
 chim_counter = 0
 alveolates_counter = 0
+
+len_limit_1 = 400
+len_limit_2 = 350
+if region == "its2":
+    len_limit_1 = 100
+    len_limit_2 = 100
 
 global_chim_dict = {}
 
@@ -65,7 +76,7 @@ with open(ex_file, "a") as ex, open(global_infile) as glob:
                 global_chim_dict[row[0]] = 1
             elif perc_alignment_cov <= 85 and perc_alignment_cov_target <= 85:
                 global_chim_dict[row[0]] = 1
-            elif int(row[3]) < 400 and int(row[7]) >= 400:
+            elif int(row[3]) < len_limit_1 and int(row[7]) >= len_limit_1:
                 global_chim_dict[row[0]] = 1
         else:
             logging.info(f"CHIM\tNOHIT_RECORD\t{row[0]}")
@@ -76,13 +87,13 @@ with open(ex_file, "a") as ex, open(global_infile) as glob:
     with open(outfile, "w") as o, open(infile, "r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             if record.id not in global_chim_dict:
-                if len(str(record.seq)) >= 350:
+                if len(str(record.seq)) >= len_limit_2:
                     o.write(f">{record.id}\n")
                     o.write(f"{record.seq}\n")
                 else:
                     nogo_counter += 1
                     logging.info(f"CHIM\tNOGO_RECORD\t{record.id}")
-                    ex.write(f"{record.id}\tCHIM\tSequence too short (<350 nucl).\n")
+                    ex.write(f"{record.id}\tCHIM\tSequence too short (<{len_limit_2} nucl).\n")
             else:
                 chim_counter += 1
                 logging.info(f"CHIM\tCHIM_RECORD\t{record.id}")
