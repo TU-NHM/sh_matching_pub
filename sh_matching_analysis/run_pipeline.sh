@@ -17,7 +17,7 @@ run_id=$1
 region=$2
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
-  echo "Region = itsfull"
+  echo "Setting region to itsfull"
   region="itsfull"
 fi
 
