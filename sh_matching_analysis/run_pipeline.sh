@@ -18,7 +18,7 @@ region=$2
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Region = itsfull"
-  $region = "itsfull"
+  region="itsfull"
 fi
 
 # get working directory
