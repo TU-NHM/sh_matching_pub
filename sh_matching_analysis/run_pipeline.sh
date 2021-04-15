@@ -21,6 +21,8 @@ if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   region="itsfull"
 fi
 
+echo "Region - $region"
+
 # get working directory
 pwd=$(pwd)
 
