@@ -37,7 +37,7 @@ a {color: #337ab7}\
 threshold_dict = {"97": "3.0", "975": "2.5", "98": "2.0", "985": "1.5", "99": "1.0", "995": "0.5", "100": "<0.5"}
 
 # dicts for statistics div
-seqs_status_hash = {}
+# seqs_status_hash = {}
 shs_hash = {}
 shs_hash["present_in"] = {}
 shs_hash["new_sh_in"] = {}
@@ -45,6 +45,9 @@ shs_hash["new_singleton_in"] = {}
 ex_shs_count = 0
 new_shs_count = 0
 new_singleton_shs_count = 0
+ex_seqs_count = 0
+new_seqs_count = 0
+new_singleton_seqs_count = 0
 ucl_hash = {}
 ucl_hash["present_in"] = {}
 ucl_hash["new_sh_in"] = {}
@@ -76,11 +79,11 @@ with open(outfile, "w") as o, open(matches_file) as m:
             sh_taxonomy = row[4]
             compound_code = row[5]
 
-            # count seqs
-            if sh_code in seqs_status_hash:
-                seqs_status_hash[sh_code] += 1
-            else:
-                seqs_status_hash[sh_code] = 1
+            # # count seqs
+            # if sh_code in seqs_status_hash:
+            #     seqs_status_hash[sh_code] += 1
+            # else:
+            #     seqs_status_hash[sh_code] = 1
             # count existing SHs
             if status == "present_in":
                 if sh_code in shs_hash["present_in"]:
@@ -88,18 +91,21 @@ with open(outfile, "w") as o, open(matches_file) as m:
                 else:
                     shs_hash["present_in"][sh_code] = 1
                     ex_shs_count += 1
+                ex_seqs_count += 1
             elif status == "new_sh_in":
                 if sh_code in shs_hash["new_sh_in"]:
                     shs_hash["new_sh_in"][sh_code] += 1
                 else:
                     shs_hash["new_sh_in"][sh_code] = 1
                     new_shs_count += 1
+                new_seqs_count += 1
             elif status == "new_singleton_in":
                 if sh_code in shs_hash["new_singleton_in"]:
                     shs_hash["new_singleton_in"][sh_code] += 1
                 else:
                     shs_hash["new_singleton_in"][sh_code] = 1
                     new_singleton_shs_count += 1
+                new_singleton_seqs_count += 1
             # count existing compounds
             if status == "present_in":
                 if compound_code in ucl_hash["present_in"]:
@@ -227,8 +233,7 @@ with open(outfile, "w") as o, open(matches_file) as m:
     o.write("<table>\n<tr><th>Status</th><th>#sequences</th><th>#existing_SHs (1.5%)</th><th>#new_SHs (3.0%)</th><th>#compounds</th></tr>\n")
     # present_in
     o.write("<tr><td>present_in</td><td>")
-    if "present_in" in seqs_status_hash:
-        o.write(str(seqs_status_hash["present_in"]))
+    o.write(str(ex_seqs_count))
     o.write("</td><td>")
     o.write(str(ex_shs_count))
     o.write("</td><td></td><td>")
@@ -236,8 +241,7 @@ with open(outfile, "w") as o, open(matches_file) as m:
     o.write("</td></tr>\n")
     # new_sh_in
     o.write("<tr><td>new_sh_in</td><td>")
-    if "new_sh_in" in seqs_status_hash:
-        o.write(str(seqs_status_hash["new_sh_in"]))
+    o.write(str(new_seqs_count))
     o.write("</td><td></td><td>")
     o.write(str(new_shs_count))
     o.write("</td><td>")
@@ -245,8 +249,7 @@ with open(outfile, "w") as o, open(matches_file) as m:
     o.write("</td></tr>\n")
     # new_singleton_in
     o.write("<tr><td>new_singleton_in</td><td>")
-    if "new_singleton_in" in seqs_status_hash:
-        o.write(str(seqs_status_hash["new_singleton_in"]))
+    o.write(str(new_singleton_seqs_count))
     o.write("</td><td></td><td>")
     o.write(str(new_singleton_shs_count))
     o.write("</td><td>")
