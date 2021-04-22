@@ -79,11 +79,6 @@ with open(outfile, "w") as o, open(matches_file) as m:
             sh_taxonomy = row[4]
             compound_code = row[5]
 
-            # # count seqs
-            # if sh_code in seqs_status_hash:
-            #     seqs_status_hash[sh_code] += 1
-            # else:
-            #     seqs_status_hash[sh_code] = 1
             # count existing SHs
             if status == "present_in":
                 if sh_code in shs_hash["present_in"]:

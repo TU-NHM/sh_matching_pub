@@ -120,5 +120,6 @@ with open(outfile, "w") as o, open(matches_file) as m:
                 for order in seq_taxonomy_dict[kgd][phy][cls]:
                     for fam in seq_taxonomy_dict[kgd][phy][cls][order]:
                         for gen in seq_taxonomy_dict[kgd][phy][cls][order][fam]:
-                            tax_name_g = kgd + ";" + phy + ";" + cls + ";" + order + ";" + fam  + ";" + gen
-                            o.write(f"{seq_taxon_count[tax_name_g]}\t{kgd[3:]}\t{phy[3:]}\t{cls[3:]}\t{order[3:]}\t{fam[3:]}\t{gen[3:]}\n")
+                            for spec in seq_taxonomy_dict[kgd][phy][cls][order][fam][gen]:
+                                tax_name_s = kgd + ";" + phy + ";" + cls + ";" + order + ";" + fam  + ";" + gen + ";" + spec
+                                o.write(f"{seq_taxon_count[tax_name_s]}\t{kgd[3:]}\t{phy[3:]}\t{cls[3:]}\t{order[3:]}\t{fam[3:]}\t{gen[3:]}\t{spec[3:]}\n")
