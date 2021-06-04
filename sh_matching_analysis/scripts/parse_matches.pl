@@ -96,7 +96,7 @@ my @thresholds = ("97", "975", "98", "985", "99", "995", "100");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_" . $threshold . ".txt";
     my $matches_outfile = $matches_dir . "/" . "matches_out_" . $threshold . ".csv";
-    my $header = "seq_id_tmp\tseq_accno\tstatus (" . $threshold_hash{$threshold} . ")\tSH code (" . $threshold_hash{$threshold} . ")\tSH/compound taxonomy (" . $threshold_hash{$threshold} . ")\tcompound_cl_code (" . $threshold_hash{$threshold} . ")\n";
+    my $header = "seq_id_tmp\tseq_accno\tstatus (" . $threshold_hash{$threshold} . ")\tSH code (" . $threshold_hash{$threshold} . ")\tSH/compound taxonomy (" . $threshold_hash{$threshold} . ")\tcompound_cl_code (" . $threshold_hash{$threshold} . ")\tCompound taxonomy (" . $threshold_hash{$threshold} . ")\n";
 
     my $new_sh_counter_th = 0;
     my $new_sh_seq_counter_th = 0;
@@ -172,10 +172,16 @@ foreach my $threshold (@thresholds) {
         }
         if (!defined($fields[3])) {
             print "Not defined - $seq_id\n";
-            print MATCHES_OUT "\t";
+            print MATCHES_OUT "\t\t";
         } else {
             print MATCHES_OUT $fields[3] . "\t";
             $duplicate_ucl_code = $fields[3];
+            # UCL taxonomy
+            if (defined($ucl_taxonomy_hash{$fields[3]})) {
+                print MATCHES_OUT $ucl_taxonomy_hash{$fields[3]} . "\t";
+            } else {
+                print MATCHES_OUT "\t";
+            }
         }
         print MATCHES_OUT "\n";
         # check duplicates
