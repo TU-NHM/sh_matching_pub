@@ -8,11 +8,12 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
 
 %post
     # Some package only available in "universe" repo
+    apt update -y
     apt install -y software-properties-common
     add-apt-repository universe
 
     apt update
-    apt upgrade
+    apt upgrade -y
 
     apt install -y python3  # Python 3.8
     apt install -y python3-pip
