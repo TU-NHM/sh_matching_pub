@@ -233,6 +233,10 @@ fi
 # parse matches files to output information about input sequences and their belonging to SHs on different thresholds
 echo "Parsing SH matches ..."
 perl $script_dir/parse_matches.pl "$run_id"
+python3 $script_dir/parse_matches_html.py "$run_id" 99
+python3 $script_dir/parse_matches_html.py "$run_id" 985
+python3 $script_dir/parse_matches_html.py "$run_id" 98
+python3 $script_dir/parse_matches_html.py "$run_id" 975
 python3 $script_dir/parse_matches_html.py "$run_id" 97
 
 # parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
@@ -241,14 +245,22 @@ perl $script_dir/parse_matches_1.pl "$run_id"
 # python3 $script_dir/parse_matches_1_html.py "$run_id" 97
 
 # create Krona chart
+python3 $script_dir/shmatches2kronatext.py "$run_id" 99
+python3 $script_dir/shmatches2kronatext.py "$run_id" 985
+python3 $script_dir/shmatches2kronatext.py "$run_id" 98
+python3 $script_dir/shmatches2kronatext.py "$run_id" 975
 python3 $script_dir/shmatches2kronatext.py "$run_id" 97
 
 # export PATH=$PATH:$PROTAX/thirdparty/krona/bin
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_99.html "$user_dir"/krona_99.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_985.html "$user_dir"/krona_985.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_98.html "$user_dir"/krona_98.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_975.html "$user_dir"/krona_975.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_97.html "$user_dir"/krona_97.txt
 
 # zip to outdata dir
 pushd "$user_dir"
-zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_97.html /sh_matching/readme.txt
+zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html /sh_matching/readme.txt
 
 mv source_"$run_id".zip "$outdata_dir"/
 popd

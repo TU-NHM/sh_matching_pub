@@ -44,7 +44,7 @@ close INFILE_ACCNOS;
 my $new_sh_counter = 0;
 my $new_singleton_counter = 0;
 
-my @thresholds = ("97", "975", "98", "985", "99", "995", "100");
+my @thresholds = ("97", "975", "98", "985", "99");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_1_" . $threshold . ".txt";
     my $matches_outfile = $matches_dir . "/" . "matches_1_out_" . $threshold . ".csv";
