@@ -14,7 +14,7 @@ my $matches_dir = $user_dir . "/matches";
 my $sh2compound_file = "/sh_matching/data/sh2compound_mapping.txt";
 my $shs_file = "/sh_matching/data/shs_out.txt";
 my $compound_file = "/sh_matching/data/compounds_out.txt";
-my $sanger_refs_file = "/sh_matching/data/sanger_refs_sh.fasta";
+my $centroid2sh_file = "/sh_matching/data/centroid2sh_mappings.txt";
 my $duplicate_seqs_file = $user_dir . "/" . "source_" . $run_id . "_fastanames";
 my $accno_seqs_file = $user_dir . "/" . "source_" . $run_id . "_names";
 
@@ -30,19 +30,15 @@ while (<SH_2_COMPOUND>) {
 }
 close SH_2_COMPOUND;
 
-# get sanger refs to SH mappings
-my %seq2sh_hash = ();
-open (SEQ_2_SH, $sanger_refs_file);
-while (<SEQ_2_SH>) {
+# get refs2sh mappings for other thresholds
+my %seq2sh_o_hash = ();
+open (SEQ_2_SH_O, $centroid2sh_file);
+while (<SEQ_2_SH_O>) {
     chomp $_;
-    if ($_ =~ m/^>(.*)$/) {
-        my @fields = split("_", $1);
-        my $seq_id = $fields[0];
-        $seq_id =~ s/i//g;
-        $seq2sh_hash{$seq_id} = $fields[1];
-    }
+    my @fields = split("\t", $1);
+    $seq2sh_o_hash{fields[2]}{$fields[0]} = $fields[1];
 }
-close SEQ_2_SH;
+close SEQ_2_SH_O;
 
 # read in SH info from shs_out.txt
 my %sh_taxonomy_hash = ();
@@ -92,7 +88,7 @@ close INFILE_ACCNOS;
 my $new_sh_counter = 0;
 my $new_singleton_counter = 0;
 
-my @thresholds = ("97", "975", "98", "985", "99", "995", "100");
+my @thresholds = ("97", "975", "98", "985", "99");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_" . $threshold . ".txt";
     my $matches_outfile = $matches_dir . "/" . "matches_out_" . $threshold . ".csv";
@@ -128,7 +124,7 @@ foreach my $threshold (@thresholds) {
         if ($fields[2] eq "present") {
             $present_counter_th++;
             # get SH name and taxon name for best match id
-            my $sh_match_code = $seq2sh_hash{$best_match_seq_id};
+            my $sh_match_code = $seq2sh_o_hash{$threshold}{$best_match_seq_id};
             print MATCHES_OUT "present_in\t" . $sh_match_code . "\t";
             if (defined($sh_taxonomy_hash{$sh_match_code})) {
                 print MATCHES_OUT $sh_taxonomy_hash{$sh_match_code} . "\t";
