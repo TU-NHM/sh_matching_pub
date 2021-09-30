@@ -19,6 +19,7 @@ my $duplicate_seqs_file = $user_dir . "/" . "source_" . $run_id . "_fastanames";
 my $accno_seqs_file = $user_dir . "/" . "source_" . $run_id . "_names";
 
 my %threshold_hash = ("97" => "3.0", "975" => "2.5", "98" => "2.0", "985" => "1.5", "99" => "1.0", "995" => "0.5", "100" => "<0.5");
+my %threshold_coded_hash = ("97" => "1", "975" => "4", "98" => "2", "985" => "5", "99" => "3", "995" => "6", "100" => "7");
 
 # get compound and SH mappings
 my %sh_ucl_hash = ();
@@ -124,7 +125,7 @@ foreach my $threshold (@thresholds) {
         if ($fields[2] eq "present") {
             $present_counter_th++;
             # get SH name and taxon name for best match id
-            my $sh_match_code = $seq2sh_o_hash{$threshold}{$best_match_seq_id};
+            my $sh_match_code = $seq2sh_o_hash{$threshold_coded_hash{$threshold}}{$best_match_seq_id};
             print MATCHES_OUT "present_in\t" . $sh_match_code . "\t";
             if (defined($sh_taxonomy_hash{$sh_match_code})) {
                 print MATCHES_OUT $sh_taxonomy_hash{$sh_match_code} . "\t";
