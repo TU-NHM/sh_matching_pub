@@ -36,7 +36,7 @@ open (SEQ_2_SH_O, $centroid2sh_file);
 while (<SEQ_2_SH_O>) {
     chomp $_;
     my @fields = split("\t", $1);
-    $seq2sh_o_hash{fields[2]}{$fields[0]} = $fields[1];
+    $seq2sh_o_hash{$fields[2]}{$fields[0]} = $fields[1];
 }
 close SEQ_2_SH_O;
 
