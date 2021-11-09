@@ -39,6 +39,8 @@ for (my $k=0; $k<scalar(@files); $k++) {
     system($system_command35);
     my $system_command4 = $bc_location . " -r " . $name_hitlist_97 . " -l " . $name_out_995 . " -S 100 -L 0.95 -b F -a 8 -e F -W 16 -o " . $name_out_100 . " -p F";
     system($system_command4);
+    my $system_command_rm = "rm " . $name_hitlist_97;
+    system($system_command_rm);
 }
 
 exit;
