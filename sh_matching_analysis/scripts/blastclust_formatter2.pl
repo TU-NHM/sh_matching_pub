@@ -18,7 +18,7 @@ for (my $k=0; $k<scalar(@files); $k++) {
     my $name = $files[$k];
     my $ucl_code = (split '\/', $name)[-1];
     my $name_out_97 = $name . "_out_97";
-    my $name_hitlist_97 = $name . "_hitlist_97"
+    my $name_hitlist_97 = $name . "_hitlist_97";
     my $name_out_975 = $name . "_out_975";
     my $name_out_98 = $name . "_out_98";
     my $name_out_985 = $name . "_out_985";
@@ -40,6 +40,8 @@ for (my $k=0; $k<scalar(@files); $k++) {
     system($system_command35);
     my $system_command4 = $bc_location . " -r " . $name_hitlist_97 . " -l " . $name_out_995 . " -S 100 -L 0.95 -b F -a 8 -e F -W 16 -o " . $name_out_100 . " -p F";
     system($system_command4);
+    my $system_command_rm = "rm " . $name_hitlist_97;
+    system($system_command_rm);
 }
 
 exit;
