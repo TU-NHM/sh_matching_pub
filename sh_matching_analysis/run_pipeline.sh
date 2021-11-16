@@ -12,16 +12,23 @@ if [ -z "$1" ]
         exit
 fi
 
-# get run id
+# get run id, region, and whether to include ITSx step in the analysis
 run_id=$1
 region=$2
+itsx_step=$3
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Setting region to itsfull"
   region="itsfull"
 fi
-
 echo "Region - $region"
+
+if [ "$itsx_step" != "yes" ] && [ "$itsx_step" != "no" ]; then
+  echo "Setting itsx_step to yes"
+  itsx_step="yes"
+fi
+
+echo "ITSx - $itsx_step"
 
 # get working directory
 pwd=$(pwd)
@@ -65,28 +72,34 @@ popd
 
 python3 "$script_dir"/reformat_mothur_output.py "$run_id"
 
-# Extract ITS regions, first for fungi, and then all other groups.
-pushd "$user_dir"
-mkdir ITSx
-perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1 -E 0.01 --search_eval 0.01
-mv itsx_sh_out* ITSx/
+if [ "$itsx_step" == "yes" ]; then
+    # Extract ITS regions, first for fungi, and then all other groups.
+    pushd "$user_dir"
+    mkdir ITSx
+    perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1 -E 0.01 --search_eval 0.01
+    mv itsx_sh_out* ITSx/
 
-mkdir ITSx_o
-perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1
-mv itsx_sh_out_o* ITSx_o/
-popd
+    mkdir ITSx_o
+    perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1
+    mv itsx_sh_out_o* ITSx_o/
+    popd
 
-# parse ITSx output
-python3 "$script_dir/print_out_fasta.py" "$run_id" "$region"
-python3 "$script_dir/print_out_fasta_o.py" "$run_id" "$region"
-cat "$user_dir/seqs_out_1.fasta" "$user_dir/seqs_out_2.fasta" > "$user_dir/seqs_out.fasta"
+    # parse ITSx output
+    python3 "$script_dir/print_out_fasta.py" "$run_id" "$region"
+    python3 "$script_dir/print_out_fasta_o.py" "$run_id" "$region"
+    cat "$user_dir/seqs_out_1.fasta" "$user_dir/seqs_out_2.fasta" > "$user_dir/seqs_out.fasta"
+else
+    pushd "$user_dir"
+    cp "$infile_new""unique" "seqs_out.fasta"
+    popd
+fi
 
 # Chimera filtering using uchime and vsearch tools
 pushd "$user_dir"
 # uchime
 "$program_dir/usearch" -uchime2_ref seqs_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -uchimeout uchime_out.txt -strand plus -mode high_confidence
 # vsearch usearch_global
-vsearch -usearch_global seqs_out.fasta -db "$data_dir/sanger_refs_sh_full.unique.fasta" -strand plus -id .75 -threads 2 -uc usearch_global.full.75.map.uc --blast6out usearch_global.full.75.blast6out.txt --output_no_hits
+vsearch -usearch_global seqs_out.fasta -db "$data_dir/sanger_refs_sh_full.unique.fasta" -strand plus -id .75 -threads 8 -uc usearch_global.full.75.map.uc --blast6out usearch_global.full.75.blast6out.txt --output_no_hits
 popd
 
 # handle all potentially chimeric sequences from uchime and usearch_global
@@ -97,7 +110,7 @@ python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 
 # Find best matches to user’s sequences in existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
-vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 2 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
+vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 8 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
 popd
 
 python3 "$script_dir/parse_vsearch_results.py" "$run_id"
