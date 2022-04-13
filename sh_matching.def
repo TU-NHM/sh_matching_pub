@@ -73,4 +73,4 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
     usearch11.0.667_i86linux32 /sh_matching/programs/usearch
     sh_matching_analysis/readme.txt /sh_matching/readme.txt
     sh_matching_analysis/run_pipeline.sh /sh_matching/run_pipeline.sh
-    sh_matching_analysis/scripts/* /sh_matching/scripts
+    sh_matching_analysis/scripts/* /sh_matching/scripts/
