@@ -48,9 +48,9 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
     # wget https://github.com/mothur/mothur/releases/download/v.1.47.0/Mothur.Ubuntu_20.zip
 
     # Installing Krona
-    wget https://github.com/marbl/Krona/releases/download/v2.8.1/KronaTools-2.8.1.tar
-    tar -xvf KronaTools-2.8.1.tar -C /sh_matching/programs/
-    cd /sh_matching/programs/KronaTools-2.8.1/
+    wget https://github.com/marbl/Krona/releases/download/v2.7.1/KronaTools-2.7.1.tar
+    tar -xvf KronaTools-2.7.1.tar -C /sh_matching/programs/
+    cd /sh_matching/programs/KronaTools-2.7.1/
     perl install.pl --prefix ../krona
     cd /
 

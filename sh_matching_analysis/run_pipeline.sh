@@ -246,16 +246,16 @@ fi
 # parse matches files to output information about input sequences and their belonging to SHs on different thresholds
 echo "Parsing SH matches ..."
 perl $script_dir/parse_matches.pl "$run_id"
+
+# parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
+perl $script_dir/parse_matches_1.pl "$run_id"
+
+# parse matches for html output
 python3 $script_dir/parse_matches_html.py "$run_id" 99
 python3 $script_dir/parse_matches_html.py "$run_id" 985
 python3 $script_dir/parse_matches_html.py "$run_id" 98
 python3 $script_dir/parse_matches_html.py "$run_id" 975
 python3 $script_dir/parse_matches_html.py "$run_id" 97
-
-# parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
-perl $script_dir/parse_matches_1.pl "$run_id"
-# ToDo
-# python3 $script_dir/parse_matches_1_html.py "$run_id" 97
 
 # create Krona chart
 python3 $script_dir/shmatches2kronatext.py "$run_id" 99
