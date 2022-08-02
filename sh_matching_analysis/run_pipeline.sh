@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# running the script - ./run_pipeline.sh <run_id>
+## running the script - ./run_pipeline.sh <run_id>
 
-# TODO LIST:
-# 1. print all excluded sequences in a separate file together with the reason they were excluded - Done
-# 2. generate output files
+## TODO LIST:
+## 1. print all excluded sequences in a separate file together with the reason they were excluded - Done
+## 2. generate output files
 
 if [ -z "$1" ]
     then
@@ -12,7 +12,7 @@ if [ -z "$1" ]
         exit
 fi
 
-# get run id, region, and whether to include ITSx step in the analysis
+## get run id, region, and whether to include ITSx step in the analysis
 run_id=$1
 region=$2
 itsx_step=$3
@@ -30,7 +30,7 @@ fi
 
 echo "ITSx - $itsx_step"
 
-# get working directory
+## get working directory
 pwd=$(pwd)
 
 script_dir="/sh_matching/scripts"
@@ -46,7 +46,7 @@ echo "Start"
 
 echo "Starting new analysis in $user_dir"
 
-# rm (if exists) user working dir and create as new
+## rm (if exists) user working dir and create as new
 if [ -d "$user_dir" ]
   then
       rm -fr "$user_dir"
@@ -58,13 +58,13 @@ touch "$err_log"
 ex_log="$user_dir/excluded_$run_id.txt"
 touch "$ex_log"
 
-# copy indata to user's workdir
+## copy indata to user's workdir
 cp "$pwd/indata/$infile" "$user_dir"
 
-# replace sequence identifiers with unique codes for the analysis
+## replace sequence identifiers with unique codes for the analysis
 python3 "$script_dir"/replace_seq_names_w_codes.py "$run_id"
 
-# remove duplicate sequences from user’s dataset
+## remove duplicate sequences from user’s dataset
 pushd "$user_dir"
 mothur "#unique.seqs(fasta=$infile_new_w_dir)"
 mv "$infile_new""unique" "$infile_new""unique_mothur"
@@ -73,18 +73,18 @@ popd
 python3 "$script_dir"/reformat_mothur_output.py "$run_id"
 
 if [ "$itsx_step" == "yes" ]; then
-    # Extract ITS regions, first for fungi, and then all other groups.
+    ## Extract ITS regions, first for fungi, and then all other groups.
     pushd "$user_dir"
     mkdir ITSx
-    perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1 -E 0.01 --search_eval 0.01
+    perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --search_eval 0.1 -E 0.1 --graphical F --complement F
     mv itsx_sh_out* ITSx/
 
     mkdir ITSx_o
-    perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions all --partial 50 --detailed_results T -concat T -preserve T -N 1
+    perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --graphical F --complement F
     mv itsx_sh_out_o* ITSx_o/
     popd
 
-    # parse ITSx output
+    ## parse ITSx output
     python3 "$script_dir/print_out_fasta.py" "$run_id" "$region"
     python3 "$script_dir/print_out_fasta_o.py" "$run_id" "$region"
     cat "$user_dir/seqs_out_1.fasta" "$user_dir/seqs_out_2.fasta" > "$user_dir/seqs_out.fasta"
@@ -94,28 +94,38 @@ else
     popd
 fi
 
-# Chimera filtering using uchime and vsearch tools
+## Chimera filtering using uchime and vsearch tools
 pushd "$user_dir"
-# uchime
+## uchime
 "$program_dir/usearch" -uchime2_ref seqs_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -uchimeout uchime_out.txt -strand plus -mode high_confidence
-# vsearch usearch_global
+## vsearch usearch_global
 vsearch -usearch_global seqs_out.fasta -db "$data_dir/sanger_refs_sh_full.unique.fasta" -strand plus -id .75 -threads 8 -uc usearch_global.full.75.map.uc --blast6out usearch_global.full.75.blast6out.txt --output_no_hits
 popd
 
-# handle all potentially chimeric sequences from uchime and usearch_global
+## handle all potentially chimeric sequences from uchime and usearch_global
 python3 "$script_dir/exclude_chims.py" "$run_id" "$region"
 
-# Additional quality controls - Remove low quality sequences (too short or with too many non-IUPAC symbols)
+## Additional quality controls - Remove low quality sequences (too short or with too many non-IUPAC symbols)
 python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 
-# Find best matches to user’s sequences in existing SH sequence dataset using usearch_global algorithm.
+## NEW: preclustering steps to keep only 0.5% representatives
+
+## usearch 97-95-90-80% clustering
+## Calculate 0.5% SHs (USEARCH calc_distmx & cluster_aggd)
+## take 0.5% representatives as RepS, add USEARCH singletons
+
+## END NEW: preclustering steps to keep only 0.5% representatives
+
+## Find best matches to user’s sequences in existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
-vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 8 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
+## vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 8 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
+# "$program_dir/usearch" -usearch_global  iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
+"$program_dir/usearch" -usearch_global  core_reps.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
 popd
 
-python3 "$script_dir/parse_vsearch_results.py" "$run_id"
+python3 "$script_dir/parse_usearch_results.py" "$run_id"
 
-# HITS: create compound clusters - Create compound clusters with user's sequences added to the existing data.
+## HITS: create compound clusters - Create compound clusters (!of core dataset only!) with user's sequences added to the existing data.
 
 echo "Creating compound clusters"
 mkdir "$user_dir/compounds"
@@ -146,11 +156,11 @@ for filename in "$bc_dir"/*.fas
     done
 popd
 
-# HITS: blastclust - Run blastclust for compound clusters
+## HITS: blastclust - Run blastclust for compound clusters
 echo "Running blastclust for HITS sequences (compounds)..."
 perl "$script_dir/blastclust_formatter2.pl" "$run_id"
 
-# parse blastclust output
+## parse blastclust output
 echo "Analysing BC output ..."
 echo "97"
 perl "$script_dir/analyse_BC_output.pl" "$run_id" 97
@@ -167,7 +177,7 @@ perl "$script_dir/analyse_BC_output.pl" "$run_id" 995
 echo "100"
 perl "$script_dir/analyse_BC_output.pl" "$run_id" 100
 
-# NOHITS: Run usearch on 4 different thresholds for those sequences that didn’t match any existing SH sequence
+## NOHITS: Run usearch on 4 different thresholds for those sequences that didn’t match any existing SH sequence
 
 if [ -f "$user_dir/nohits.fasta" ]
     then
@@ -175,29 +185,29 @@ if [ -f "$user_dir/nohits.fasta" ]
 
         if [ "$nohits_count" -gt 0 ]
             then
-                # USEARCH run
+                ## USEARCH run
                 rm -fr "$user_dir/clusters"
                 mkdir "$user_dir/clusters"
                 mkdir "$user_dir/clusters/clusters"
                 mkdir "$user_dir/clusters/singletons"
 
-                # 97%
+                ## 97%
                 "$program_dir/usearch" -cluster_fast "$user_dir/nohits.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_97.uc"
                 python3 "$script_dir/clusterparser_preclust1.py" "$run_id"
 
-                # 95%
+                ## 95%
                 "$program_dir/usearch" -cluster_fast "$user_dir/in_95.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_95.uc"
                 python3 "$script_dir/clusterparser_preclust2.py" "$run_id"
 
-                # 90%
+                ## 90%
                 "$program_dir/usearch" -cluster_fast "$user_dir/in_90.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_90.uc"
                 python3 "$script_dir/clusterparser_preclust3.py" "$run_id"
 
-                # 80%
+                ## 80%
                 "$program_dir/usearch" -cluster_fast "$user_dir/in_80.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_80.uc"
                 python3 "$script_dir/clusterparser_preclust_final.py" "$run_id"
 
-                # NOHITS: Run blastclust for NOHITS compound clusters
+                ## NOHITS: Run blastclust for NOHITS compound clusters
                 rm -fr "$user_dir"/blastclust_1
                 rm -fr "$user_dir"/blastclust_out_1
 
@@ -218,10 +228,10 @@ if [ -f "$user_dir/nohits.fasta" ]
                             done
                     done
 
-                # do blastclust clustering
+                ## do blastclust clustering
                 perl "$script_dir/blastclust_formatter2_1.pl" "$run_id"
 
-                # parse blastclust output
+                ## parse blastclust output
                 echo "97 (nohits)"
                 python3 $script_dir/analyse_BC_output_1.py "$run_id" 97
                 echo "975 (nohits)"
@@ -242,46 +252,47 @@ if [ -f "$user_dir/nohits.fasta" ]
         fi
 fi
 
-# Generate output files (based on matches_*.txt files).
-# parse matches files to output information about input sequences and their belonging to SHs on different thresholds
+## Generate output files (based on matches_*.txt files).
+## parse matches files to output information about input sequences and their belonging to SHs on different thresholds
 echo "Parsing SH matches ..."
 perl $script_dir/parse_matches.pl "$run_id"
 
-# parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
+## parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
 perl $script_dir/parse_matches_1.pl "$run_id"
 
-# parse matches for html output
+## parse matches for html output
 python3 $script_dir/parse_matches_html.py "$run_id" 99
 python3 $script_dir/parse_matches_html.py "$run_id" 985
 python3 $script_dir/parse_matches_html.py "$run_id" 98
 python3 $script_dir/parse_matches_html.py "$run_id" 975
 python3 $script_dir/parse_matches_html.py "$run_id" 97
 
-# create Krona chart
+## create Krona chart
 python3 $script_dir/shmatches2kronatext.py "$run_id" 99
 python3 $script_dir/shmatches2kronatext.py "$run_id" 985
 python3 $script_dir/shmatches2kronatext.py "$run_id" 98
 python3 $script_dir/shmatches2kronatext.py "$run_id" 975
 python3 $script_dir/shmatches2kronatext.py "$run_id" 97
 
-# export PATH=$PATH:$PROTAX/thirdparty/krona/bin
+## export PATH=$PATH:$PROTAX/thirdparty/krona/bin
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_99.html "$user_dir"/krona_99.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_985.html "$user_dir"/krona_985.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_98.html "$user_dir"/krona_98.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_975.html "$user_dir"/krona_975.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_97.html "$user_dir"/krona_97.txt
 
-# zip to outdata dir
+## zip to outdata dir
 pushd "$user_dir"
 zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html /sh_matching/readme.txt
 
 mv source_"$run_id".zip "$outdata_dir"/
 popd
 
-# # clean user working dir
+# ## clean user working dir
 # if [ -d "$user_dir" ]
 #   then
 #       rm -fr "$user_dir"
 # fi
 
 echo "End"
+
