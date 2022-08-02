@@ -47,9 +47,9 @@ new_length_dict = {}
 no_coverage_count = 0
 full_seq_dict = {}
 full_counter = 0
-full_new_counter = 0  # TODO - doesn't seem to be used
 its2_counter = 0
 len_limit = 140
+ex_o_ct = 0
 
 # read in ITS positions (to make sure that ITS1, 5.8S and ITS2 regions are all found, but may just be too short)
 if region == "itsfull":
@@ -59,7 +59,10 @@ if region == "itsfull":
         for row in dataReader_pos:
             if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
                 chim_match = re.search("Chimeric!", row[7])
-                if not chim_match:
+                part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
+                no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
+                too_long_match = re.search("ITS region too long!", row[7])
+                if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
                     positions_dict[row[0]] = 1
                     len_fields = row[1].split(" ")
                     length_dict[row[0]] = int(len_fields[0])
@@ -71,7 +74,8 @@ elif region == "its2":
         for row in dataReader_pos:
             if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
                 chim_match = re.search("Chimeric!", row[7])
-                if not chim_match:
+                too_long_match = re.search("ITS region too long!", row[7])
+                if not chim_match and not too_long_match:
                     positions_dict[row[0]] = 1
                     len_fields = row[1].split(" ")
                     length_dict[row[0]] = int(len_fields[0])
@@ -90,12 +94,17 @@ if region == "itsfull":
         for row in dataReader_pos_o:
             if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
                 chim_match = re.search("Chimeric!", row[7])
-                if not chim_match:
+                part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
+                no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
+                too_long_match = re.search("ITS region too long!", row[7])
+                if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
                     new_positions_dict[row[0]] = 1
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric according to ITSx.\n")
+                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.\n")
+            else:
+                ex_o_ct += 1
 elif region == "its2":
     with open(ex_file, "a") as ex, open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
@@ -103,12 +112,15 @@ elif region == "its2":
         for row in dataReader_pos_o:
             if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
                 chim_match = re.search("Chimeric!", row[7])
-                if not chim_match:
+                too_long_match = re.search("ITS region too long!", row[7])
+                if not chim_match and not too_long_match:
                     new_positions_dict[row[0]] = 1
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric according to ITSx.\n")
+                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.\n")
+            else:
+                ex_o_ct += 1
 
 # get ITS sequence from full file into hash
 with open(full_file, "r") as handle:
@@ -145,6 +157,8 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile_o, "r") as h
 logging.info(f"PRINT_FAS_O\tNo coverage for {no_coverage_count} sequences.")
 logging.info(
     f"PRINT_FAS_O\tNo. of full seqs: {full_counter}; "
-    f"No. of full new seqs: {full_new_counter}; "
     f"No of ITS2 seqs: {its2_counter}"
+)
+logging.info(
+    f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"
 )
