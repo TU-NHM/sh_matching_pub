@@ -116,11 +116,11 @@ python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 
 ## END NEW: preclustering steps to keep only 0.5% representatives
 
-## Find best matches to user’s sequences in existing SH sequence dataset using usearch_global algorithm.
+## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
 ## vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 8 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
-# "$program_dir/usearch" -usearch_global  iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
-"$program_dir/usearch" -usearch_global  core_reps.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
+"$program_dir/usearch" -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
+# "$program_dir/usearch" -usearch_global  core_reps.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
 popd
 
 python3 "$script_dir/parse_usearch_results.py" "$run_id"
@@ -260,6 +260,9 @@ perl $script_dir/parse_matches.pl "$run_id"
 ## parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
 perl $script_dir/parse_matches_1.pl "$run_id"
 
+## merge parse_matches*.pl output into one CSV file
+python3 $script_dir/merge_matches.py "$run_id"
+
 ## parse matches for html output
 python3 $script_dir/parse_matches_html.py "$run_id" 99
 python3 $script_dir/parse_matches_html.py "$run_id" 985
@@ -295,4 +298,3 @@ popd
 # fi
 
 echo "End"
-

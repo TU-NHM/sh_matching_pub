@@ -18,7 +18,7 @@ if not run_id.isdigit():
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 data_dir = Path("/sh_matching/data")
 infile = user_dir / "iupac_out.fasta"
-tmp_infile = user_dir / "closedref.75.map.uc"
+tmp_infile = user_dir / "closedref.80-best-hits.map.uc"
 compounds_file = user_dir / "compounds.txt"
 exact_matches_file = user_dir / "exact_matches.txt"
 sanger_refs_file = data_dir / "sanger_refs_sh.fasta"

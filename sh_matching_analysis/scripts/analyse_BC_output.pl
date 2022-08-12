@@ -101,7 +101,7 @@ for (my $k=0; $k<scalar(@files); $k++) {
 }
 
 # read in best matches (seq and SH)
-my $tmp_infile = $user_dir . "/closedref.75.map.uc";
+my $tmp_infile = $user_dir . "/closedref.80-best-hits.map.uc";
 open (INFILE, $tmp_infile);
 while (<INFILE>) {
     chomp $_;
