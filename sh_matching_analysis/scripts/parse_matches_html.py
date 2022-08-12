@@ -1,7 +1,6 @@
 import argparse
 import csv
 import os
-import subprocess
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description="Script to output HTML output for matches")

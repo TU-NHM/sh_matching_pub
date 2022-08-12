@@ -89,6 +89,7 @@ close INFILE_ACCNOS;
 my $new_sh_counter = 0;
 my $new_singleton_counter = 0;
 
+## TODO: Add 995 as well once ref. data is updated
 my @thresholds = ("97", "975", "98", "985", "99");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_" . $threshold . ".txt";
