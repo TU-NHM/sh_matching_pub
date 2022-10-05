@@ -22,7 +22,9 @@ if not allowed_number.isdigit():
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 infile = user_dir / "seqs_out_chim.fasta"
-outfile = user_dir / "iupac_out.fasta"
+infile_orig = user_dir / f"source_{run_id}_fastaunique"
+outfile = user_dir / "iupac_out_full.fasta"
+outfile_vsearch_96 = user_dir / "iupac_out_vsearch_96.fasta"
 
 # Logging conf
 log_file = user_dir / f"err_{run_id}.log"
@@ -31,10 +33,16 @@ logging.basicConfig(
 )
 ex_file = user_dir / f"excluded_{run_id}.txt"
 
+# use the original sequence for vsearch 100% clustering and not the one that came out from ITSx extractor
+orig_seqs_dict = {}
+with open(infile_orig, "r") as handle:
+    for record in SeqIO.parse(handle, "fasta"):
+        orig_seqs_dict[record.id] = record.seq
+
 infile_hash1 = {}
 
 # open excluded seq file
-with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile, "r") as handle:
+with open(ex_file, "a") as ex, open(outfile, "w") as o, open(outfile_vsearch_96, "w") as o2, open(infile, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
         name = record.id
         seq = str(record.seq).upper()
@@ -62,6 +70,8 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile, "r") as han
                     else:
                         o.write(f">{name}\n")
                         o.write(f"{part_1}\n")
+                        o2.write(f">{name}\n")
+                        o2.write(f"{orig_seqs_dict[name]}\n")
                 else:
                     logging.info(f"IUPAC\tIUPAC PROBLEM: {name} ({numberofIUPACs_1}, {numberofIUPACs_2}, cut but too short to fix)")
                     ex.write(f"{name}\tIUPAC\tThe number of ambiguous bases ({numberofIUPACs_1}, {numberofIUPACs_2}) in sequence exceeds the number of allowed ambiguous bases (16, {allowed_number}). Cut, but too short to fix.\n")
@@ -71,3 +81,5 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile, "r") as han
         else:
             o.write(f">{name}\n")
             o.write(f"{seq}\n")
+            o2.write(f">{name}\n")
+            o2.write(f"{orig_seqs_dict[name]}\n")
