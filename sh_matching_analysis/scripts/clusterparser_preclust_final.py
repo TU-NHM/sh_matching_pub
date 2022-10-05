@@ -126,7 +126,7 @@ with open(tmp_file_nohits, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
         original_seq_dict[record.id] = str(record.seq)
 
-# start dividing clusters into real clusters (also align with mafft) and singletons in fasta files
+# start dividing clusters into real clusters and singletons in fasta files
 with open(tmp_file4) as f:
     dataReader = csv.reader(f, delimiter="\t")
     for row in dataReader:

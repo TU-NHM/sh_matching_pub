@@ -3,8 +3,10 @@
 ## running the script - ./run_pipeline.sh <run_id>
 
 ## TODO LIST:
-## 1. print all excluded sequences in a separate file together with the reason they were excluded - Done
-## 2. generate output files
+## 1. Generate new HTML output files
+## 2. Check out log output (some steps are not logged at all)
+## 3. Check if all excluded sequences are reported in del file
+## 4. improve commenting inside the code
 
 if [ -z "$1" ]
     then
@@ -36,7 +38,9 @@ pwd=$(pwd)
 script_dir="/sh_matching/scripts"
 data_dir="/sh_matching/data"
 outdata_dir="$pwd/outdata"
-user_dir="$pwd/userdir/"$run_id
+user_dir="$pwd/userdir/$run_id"
+clusters_pre_dir="$user_dir/clusters_pre"
+clusters_dir="$user_dir/clusters"
 program_dir="/sh_matching/programs"
 infile="source_$run_id"
 infile_new=$infile"_fasta"
@@ -66,11 +70,9 @@ python3 "$script_dir"/replace_seq_names_w_codes.py "$run_id"
 
 ## remove duplicate sequences from user’s dataset
 pushd "$user_dir"
-mothur "#unique.seqs(fasta=$infile_new_w_dir)"
-mv "$infile_new""unique" "$infile_new""unique_mothur"
+"$program_dir/vsearch/bin/vsearch" --fastx_uniques $infile_new_w_dir --fastaout "$infile_new""unique" --uc "$infile_new""uc"
 popd
-
-python3 "$script_dir"/reformat_mothur_output.py "$run_id"
+python3 "$script_dir"/reformat_fastx_uniques_output.py "$run_id"
 
 if [ "$itsx_step" == "yes" ]; then
     ## Extract ITS regions, first for fungi, and then all other groups.
@@ -97,9 +99,9 @@ fi
 ## Chimera filtering using uchime and vsearch tools
 pushd "$user_dir"
 ## uchime
-"$program_dir/usearch" -uchime2_ref seqs_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -uchimeout uchime_out.txt -strand plus -mode high_confidence
+"$program_dir/usearch" -uchime2_ref "$user_dir/seqs_out.fasta" -db "$data_dir/sanger_refs_sh.fasta" -uchimeout "$user_dir/uchime_out.txt" -strand plus -mode high_confidence
 ## vsearch usearch_global
-vsearch -usearch_global seqs_out.fasta -db "$data_dir/sanger_refs_sh_full.unique.fasta" -strand plus -id .75 -threads 8 -uc usearch_global.full.75.map.uc --blast6out usearch_global.full.75.blast6out.txt --output_no_hits
+"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/seqs_out.fasta" --db "$data_dir/sanger_refs_sh.fasta" --strand plus --id .75 --threads 8 --uc "$user_dir/usearch_global.full.75.map.uc" --blast6out "$user_dir/usearch_global.full.75.blast6out.txt" --output_no_hits
 popd
 
 ## handle all potentially chimeric sequences from uchime and usearch_global
@@ -108,19 +110,123 @@ python3 "$script_dir/exclude_chims.py" "$run_id" "$region"
 ## Additional quality controls - Remove low quality sequences (too short or with too many non-IUPAC symbols)
 python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 
+## Allow query sequences vary 4% in length at 100% similarity
+echo "Running vsearch 100% clustering"
+pushd $user_dir
+"$program_dir/vsearch/bin/vsearch" --cluster_fast "$user_dir/iupac_out_vsearch_96.fasta" --id 1 --iddef 0 --threads 8 --uc "$user_dir/clusters_100.uc" --centroids "$user_dir/centroids_100.fasta" --query_cov 0.96 --target_cov 0.96
+popd
+
+## step in here with the vsearch representatives (the sequence count diff. is 9.5% for vsearch 4%)
+echo "Printing out vsearch representatives"
+python3 "$script_dir/select_vsearch_reps.py" "$run_id"
+
 ## NEW: preclustering steps to keep only 0.5% representatives
 
-## usearch 97-95-90-80% clustering
-## Calculate 0.5% SHs (USEARCH calc_distmx & cluster_aggd)
-## take 0.5% representatives as RepS, add USEARCH singletons
+## 1. usearch 97-95-90-80% clustering
+echo "usearch clustering"
+rm -fr $clusters_pre_dir
+mkdir $clusters_pre_dir
+mkdir "$clusters_pre_dir/clusters"
+mkdir "$clusters_pre_dir/singletons"
+
+## 97% pre-clustering
+"$program_dir/usearch" -cluster_fast "$user_dir/iupac_out_vsearch.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_97_pre.uc"
+python3 "$script_dir/clusterparser_preclust1_pre.py" "$run_id"
+
+## 95% pre-clustering
+"$program_dir/usearch" -cluster_fast "$user_dir/in_95_pre.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_95_pre.uc"
+python3 "$script_dir/clusterparser_preclust2_pre.py" "$run_id"
+
+## 90% pre-clustering
+"$program_dir/usearch" -cluster_fast "$user_dir/in_90_pre.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_90_pre.uc"
+python3 "$script_dir/clusterparser_preclust3_pre.py" "$run_id"
+
+## 80% clustering
+"$program_dir/usearch" -cluster_fast "$user_dir/in_80_pre.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_80_pre.uc"
+python3 "$script_dir/clusterparser_preclust_final_pre.py" "$run_id"
+
+## remove unneeded uc, txt, and fasta files
+rm "$user_dir/clusters_97_pre.uc"
+rm "$user_dir/clusters_95_pre.uc"
+rm "$user_dir/clusters_90_pre.uc"
+rm "$user_dir/clusters_80_pre.uc"
+rm "$user_dir/clusters_out_97_pre.txt"
+rm "$user_dir/clusters_out_95_pre.txt"
+rm "$user_dir/clusters_out_90_pre.txt"
+rm "$user_dir/clusters_out_80_pre.txt"
+rm "$user_dir/in_95_pre.fasta"
+rm "$user_dir/in_90_pre.fasta"
+rm "$user_dir/in_80_pre.fasta"
+
+cd "$clusters_pre_dir/clusters/"
+touch "$clusters_pre_dir/tmp.txt"
+for nbr1 in {0..9}
+    do
+        if ls Cluster$nbr1 1> /dev/null 2>&1
+            then
+                ls Cluster$nbr1 >> "$clusters_pre_dir/tmp.txt"
+        fi
+    for nbr2 in {0..9}
+        do
+            if ls Cluster$nbr1$nbr2* 1> /dev/null 2>&1
+                then
+                    ls Cluster$nbr1$nbr2* >> "$clusters_pre_dir/tmp.txt"
+            fi
+        done
+    done
+
+cd "$clusters_pre_dir/singletons/"
+ls Singleton* > "$clusters_pre_dir/singletons.txt"
+cd $pwd
+
+## write vsearch clustering duplicates into duplic_seqs.txt file
+python3 "$script_dir/usearch_parser.py" "$run_id"
+
+## go through 80% uclust clusters and run 90% usearch clustering if needed (if >16000 in cluster size)
+## 2. calculate 0.5% clusters (USEARCH calc_distmx & cluster_aggd)
+touch "$user_dir/seq_mappings.txt"
+rm -fr "$clusters_pre_dir/clusters/calc_distm_out"
+mkdir "$clusters_pre_dir/clusters/calc_distm_out"
+
+input_95="$clusters_pre_dir/tmp.txt"
+while IFS= read -r line
+do
+    fname="$clusters_pre_dir/clusters/$line"
+    if [ -f "$fname" ]
+        then
+            result=$(grep -c ">" "$fname")
+            if (( "$result" > "16000" ))
+                then
+                    echo "to be split:"$line":"$result
+                    "$program_dir/usearch" -cluster_fast $fname -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$clusters_pre_dir/clusters_2_90.uc"
+                    ## cluster into clusters_pre/ClusterX_folder/
+                    rm -fr "$clusters_pre_dir/clusters/"$line"_folder"
+                    mkdir "$clusters_pre_dir/clusters/"$line"_folder"
+                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/clusters"
+                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/singletons"
+                    ## parse usearch clusters
+                    python3 "$script_dir/clusterparser_usearch_90_pre.py" "$run_id" "$line"
+                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/calc_distm_out"
+                    ## calculate usearch distance matrix
+                    python3 "$script_dir/calc_distm_formatter_90_pre.py" "$run_id" "$line"
+            else
+                echo "sm:"$line":"$result
+                ## calculate usearch distance matrix
+                python3 "$script_dir/calc_distm_formatter_80_pre.py" "$run_id" "$line"
+            fi
+    fi
+done < "$input_95"
+
+## 3. take 0.5% representatives as RepS, add USEARCH singletons
+python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
 
 ## END NEW: preclustering steps to keep only 0.5% representatives
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
+## TODO: replace with vsearch
 pushd "$user_dir"
-## vsearch -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id .75 -threads 8 -uc closedref.75.map.uc --alnout closedref.75.aln --blast6out closedref.75.blast6out.txt --output_no_hits
-"$program_dir/usearch" -usearch_global iupac_out.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
-# "$program_dir/usearch" -usearch_global  core_reps.fasta -db "$data_dir/sanger_refs_sh.fasta" -strand plus -id 0.8 -threads 8 -uc closedref.80.map.uc -maxaccepts 3
+# "$program_dir/usearch" -usearch_global "$user_dir/core_reps_pre.fasta" -db "$data_dir/sanger_refs_sh_full.fasta" -strand plus -id 0.8 -threads 8 -uc "$user_dir/closedref.80.map.uc" -maxaccepts 3
+"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$data_dir/sanger_refs_sh_full.fasta" --strand plus --id 0.8 --threads 8 --iddef 0 --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
 popd
 
 python3 "$script_dir/parse_usearch_results.py" "$run_id"
@@ -129,53 +235,76 @@ python3 "$script_dir/parse_usearch_results.py" "$run_id"
 
 echo "Creating compound clusters"
 mkdir "$user_dir/compounds"
-mkdir "$user_dir/blastclust"
 mkdir "$user_dir/matches"
 
 python3 "$script_dir/create_compound_clusters.py" "$run_id"
 
-echo "Copying compounds to blastclust folder"
-pushd "$user_dir"
-for nbr1 in 0 1 2 3 4 5 6 7 8 9
+## go through compound clusters and run 90% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
+rm -fr "$user_dir/compounds/calc_distm_out"
+mkdir "$user_dir/compounds/calc_distm_out"
+
+pushd "$user_dir/compounds/"
+touch "$user_dir/compounds/tmp.txt"
+for nbr1 in {0..9}
     do
-    for nbr2 in 0 1 2 3 4 5 6 7 8 9
-        do
-            if ls compounds/UCL8_0$nbr1$nbr2* 1> /dev/null 2>&1
-                then
-                    cp compounds/UCL8_0$nbr1$nbr2* blastclust/
-            fi
-        done
+        for nbr2 in {0..9}
+            do
+                if ls UCL9_0$nbr1$nbr2* 1> /dev/null 2>&1
+                    then
+                        ls UCL9_0$nbr1$nbr2* >> "$user_dir/compounds/tmp.txt"
+                fi
+            done
     done
 popd
 
-bc_dir="$user_dir/blastclust"
-pushd "$bc_dir"
-for filename in "$bc_dir"/*.fas
-    do
-        mothur "#unique.seqs(fasta=$filename)"
-    done
-popd
+input_95="$user_dir/compounds/tmp.txt"
+while IFS= read -r line
+do
+    fname=$user_dir"/compounds/"$line
+    if [ -f "$fname" ]
+    then
+        result=$(grep -c ">" "$fname")
+        if (( "$result" > "16000" ))
+            then
+            echo "to be split:"$line":"$result
+            "$program_dir/usearch" -cluster_fast $fname -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/compounds/clusters_2_90.uc"
+            ## cluster into usearch_sh/ClusterX_folder/
+            rm -fr $user_dir"/compounds/"$line"_folder"
+            mkdir $user_dir"/compounds/"$line"_folder"
+            mkdir $user_dir"/compounds/"$line"_folder/clusters"
+            mkdir $user_dir"/compounds/"$line"_folder/singletons"
+            ## parse usearch clusters
+            python3 $script_dir"/clusterparser_usearch_90.py" "$run_id" "$line"
+            ## Calculate SHs (max 3.0% distance)
+            mkdir $user_dir"/compounds/"$line"_folder/calc_distm_out"
+            # calculate usearch distance matrix and generate (SH) clusters
+            python3 $script_dir"/calc_distm_formatter_90.py" "$run_id" "$line"
+        else
+            echo "sm:"$line":"$result
+            # calculate usearch distance matrix and generate (SH) clusters
+            python3 $script_dir"/calc_distm_formatter_80.py" "$run_id" "$line"
+        fi
+  fi
+done < "$input_95"
 
-## HITS: blastclust - Run blastclust for compound clusters
-echo "Running blastclust for HITS sequences (compounds)..."
-perl "$script_dir/blastclust_formatter2.pl" "$run_id"
+## parse usearch output
+echo "Parsing usearch output ..."
+echo "03"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 03
+echo "025"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 025
+echo "02"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 02
+echo "015"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 015
+echo "01"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 01
+echo "005"
+python3 "$script_dir/analyse_usearch_output.py" "$run_id" 005
 
-## parse blastclust output
-echo "Analysing BC output ..."
-echo "97"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 97
-echo "975"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 975
-echo "98"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 98
-echo "985"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 985
-echo "99"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 99
-echo "995"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 995
-echo "100"
-perl "$script_dir/analyse_BC_output.pl" "$run_id" 100
+## parse matches files to output information about input sequences and their belonging to SHs on different thresholds
+echo "Parsing SH matches ..."
+perl $script_dir/parse_matches.pl "$run_id"
 
 ## NOHITS: Run usearch on 4 different thresholds for those sequences that didn’t match any existing SH sequence
 
@@ -186,103 +315,127 @@ if [ -f "$user_dir/nohits.fasta" ]
         if [ "$nohits_count" -gt 0 ]
             then
                 ## USEARCH run
-                rm -fr "$user_dir/clusters"
-                mkdir "$user_dir/clusters"
-                mkdir "$user_dir/clusters/clusters"
-                mkdir "$user_dir/clusters/singletons"
+                rm -fr "$clusters_dir"
+                mkdir "$clusters_dir"
+                mkdir "$clusters_dir/clusters"
+                mkdir "$clusters_dir/singletons"
 
                 ## 97%
-                "$program_dir/usearch" -cluster_fast "$user_dir/nohits.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_97.uc"
+                "$program_dir/usearch" -cluster_fast "$user_dir/nohits.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -uc "$user_dir/clusters_97.uc"
                 python3 "$script_dir/clusterparser_preclust1.py" "$run_id"
 
                 ## 95%
-                "$program_dir/usearch" -cluster_fast "$user_dir/in_95.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_95.uc"
+                "$program_dir/usearch" -cluster_fast "$user_dir/in_95.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -uc "$user_dir/clusters_95.uc"
                 python3 "$script_dir/clusterparser_preclust2.py" "$run_id"
 
                 ## 90%
-                "$program_dir/usearch" -cluster_fast "$user_dir/in_90.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_90.uc"
+                "$program_dir/usearch" -cluster_fast "$user_dir/in_90.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -uc "$user_dir/clusters_90.uc"
                 python3 "$script_dir/clusterparser_preclust3.py" "$run_id"
 
                 ## 80%
-                "$program_dir/usearch" -cluster_fast "$user_dir/in_80.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -centroids "$user_dir/centroids.fasta" -uc "$user_dir/clusters_80.uc"
+                "$program_dir/usearch" -cluster_fast "$user_dir/in_80.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -uc "$user_dir/clusters_80.uc"
                 python3 "$script_dir/clusterparser_preclust_final.py" "$run_id"
 
-                ## NOHITS: Run blastclust for NOHITS compound clusters
-                rm -fr "$user_dir"/blastclust_1
-                rm -fr "$user_dir"/blastclust_out_1
+                ## NOHITS: Run usearch "calc_distmx & cluster_aggd" for NOHITS compound clusters
+                ## go through compound clusters and run 90% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
+                rm -fr "$clusters_dir/clusters/calc_distm_out"
+                mkdir "$clusters_dir/clusters/calc_distm_out"
 
-                mkdir "$user_dir"/blastclust_1
-
-                for nbr1 in 0 1 2 3 4 5 6 7 8 9
+                pushd "$clusters_dir/clusters/"
+                touch "$clusters_dir/tmp.txt"
+                for nbr1 in {0..9}
                     do
-                        if ls "$user_dir"/clusters/clusters/Cluster$nbr1 1> /dev/null 2>&1
+                        if ls Cluster$nbr1* 1> /dev/null 2>&1
                             then
-                                mv "$user_dir"/clusters/clusters/Cluster$nbr1 "$user_dir"/blastclust_1/
+                                ls Cluster$nbr1* >> "$clusters_dir/tmp.txt"
                         fi
-                        for nbr2 in 0 1 2 3 4 5 6 7 8 9
-                            do
-                                if ls "$user_dir"/clusters/clusters/Cluster$nbr1$nbr2 1> /dev/null 2>&1
-                                    then
-                                        mv "$user_dir"/clusters/clusters/Cluster$nbr1$nbr2* "$user_dir"/blastclust_1/
-                                fi
-                            done
                     done
+                    for nbr2 in {0..9}
+                        do
+                            if ls Cluster$nbr1$nbr2* 1> /dev/null 2>&1
+                                then
+                                    ls Cluster$nbr1$nbr2* >> "$clusters_dir/tmp.txt"
+                            fi
+                        done
+                popd
 
-                ## do blastclust clustering
-                perl "$script_dir/blastclust_formatter2_1.pl" "$run_id"
+                input_95="$clusters_dir/tmp.txt"
+                while IFS= read -r line
+                do
+                    fname="$clusters_dir/clusters/$line"
+                    if [ -f "$fname" ]
+                    then
+                        result=$(grep -c ">" "$fname")
+                        if (( "$result" > "16000" ))
+                            then
+                            echo "to be split:"$line":"$result
+                            "$program_dir/usearch" -cluster_fast $fname -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$clusters_dir/clusters_2_90.uc"
+                            ## cluster into clusters/ClusterX_folder/
+                            rm -fr $clusters_dir"/clusters/"$line"_folder"
+                            mkdir $clusters_dir"/clusters/"$line"_folder"
+                            mkdir $clusters_dir"/clusters/"$line"_folder/clusters"
+                            mkdir $clusters_dir"/clusters/"$line"_folder/singletons"
+                            ## parse usearch clusters
+                            python3 $script_dir"/clusterparser_usearch_90_nohit.py" "$run_id" "$line"
+                            ## Calculate SHs (max 3.0% distance)
+                            mkdir $clusters_dir"/clusters/"$line"_folder/calc_distm_out"
+                            # calculate usearch distance matrix and generate (SH) clusters
+                            python3 $script_dir"/calc_distm_formatter_90_nohit.py" "$run_id" "$line"
+                        else
+                            echo "sm:"$line":"$result
+                            # calculate usearch distance matrix and generate (SH) clusters
+                            python3 $script_dir"/calc_distm_formatter_80_nohit.py" "$run_id" "$line"
+                        fi
+                  fi
+                done < "$input_95"
 
                 ## parse blastclust output
-                echo "97 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 97
-                echo "975 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 975
-                echo "98 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 98
-                echo "985 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 985
-                echo "99 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 99
-                echo "995 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 995
-                echo "100 (nohits)"
-                python3 $script_dir/analyse_BC_output_1.py "$run_id" 100
+                echo "03 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 03
+                echo "025 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 025
+                echo "02 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 02
+                echo "015 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 015
+                echo "01 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 01
+                echo "005 (nohits)"
+                python3 $script_dir/analyse_usearch_output_1.py "$run_id" 005
 
+                ## parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
+                perl $script_dir/parse_matches_1.pl "$run_id"
             else
                 echo "No NOHITS sequences found."
         fi
 fi
 
-## Generate output files (based on matches_*.txt files).
-## parse matches files to output information about input sequences and their belonging to SHs on different thresholds
-echo "Parsing SH matches ..."
-perl $script_dir/parse_matches.pl "$run_id"
-
-## parse matches_1 files (nohits) to output information about input sequences and their belonging to new SHs on different thresholds
-perl $script_dir/parse_matches_1.pl "$run_id"
-
 ## merge parse_matches*.pl output into one CSV file
 python3 $script_dir/merge_matches.py "$run_id"
 
 ## parse matches for html output
-python3 $script_dir/parse_matches_html.py "$run_id" 99
-python3 $script_dir/parse_matches_html.py "$run_id" 985
-python3 $script_dir/parse_matches_html.py "$run_id" 98
-python3 $script_dir/parse_matches_html.py "$run_id" 975
-python3 $script_dir/parse_matches_html.py "$run_id" 97
+python3 $script_dir/parse_matches_html.py "$run_id" 005
+python3 $script_dir/parse_matches_html.py "$run_id" 01
+python3 $script_dir/parse_matches_html.py "$run_id" 015
+python3 $script_dir/parse_matches_html.py "$run_id" 02
+python3 $script_dir/parse_matches_html.py "$run_id" 025
+python3 $script_dir/parse_matches_html.py "$run_id" 03
 
 ## create Krona chart
-python3 $script_dir/shmatches2kronatext.py "$run_id" 99
-python3 $script_dir/shmatches2kronatext.py "$run_id" 985
-python3 $script_dir/shmatches2kronatext.py "$run_id" 98
-python3 $script_dir/shmatches2kronatext.py "$run_id" 975
-python3 $script_dir/shmatches2kronatext.py "$run_id" 97
+python3 $script_dir/shmatches2kronatext.py "$run_id" 005
+python3 $script_dir/shmatches2kronatext.py "$run_id" 01
+python3 $script_dir/shmatches2kronatext.py "$run_id" 015
+python3 $script_dir/shmatches2kronatext.py "$run_id" 02
+python3 $script_dir/shmatches2kronatext.py "$run_id" 025
+python3 $script_dir/shmatches2kronatext.py "$run_id" 03
 
 ## export PATH=$PATH:$PROTAX/thirdparty/krona/bin
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_99.html "$user_dir"/krona_99.txt
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_985.html "$user_dir"/krona_985.txt
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_98.html "$user_dir"/krona_98.txt
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_975.html "$user_dir"/krona_975.txt
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_97.html "$user_dir"/krona_97.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_01.html "$user_dir"/krona_005.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_01.html "$user_dir"/krona_01.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_015.html "$user_dir"/krona_015.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_02.html "$user_dir"/krona_02.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_025.html "$user_dir"/krona_025.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_03.html "$user_dir"/krona_03.txt
 
 ## zip to outdata dir
 pushd "$user_dir"

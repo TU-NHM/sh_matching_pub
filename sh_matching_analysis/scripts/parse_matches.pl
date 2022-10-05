@@ -11,15 +11,20 @@ if ($run_id !~ m/^[0-9]{1,}$/) {
 
 my $user_dir = "userdir/$run_id";
 my $matches_dir = $user_dir . "/matches";
+
 my $sh2compound_file = "/sh_matching/data/sh2compound_mapping.txt";
 my $shs_file = "/sh_matching/data/shs_out.txt";
 my $compound_file = "/sh_matching/data/compounds_out.txt";
 my $centroid2sh_file = "/sh_matching/data/centroid2sh_mappings.txt";
-my $duplicate_seqs_file = $user_dir . "/" . "source_" . $run_id . "_fastanames";
-my $accno_seqs_file = $user_dir . "/" . "source_" . $run_id . "_names";
 
-my %threshold_hash = ("97" => "3.0", "975" => "2.5", "98" => "2.0", "985" => "1.5", "99" => "1.0", "995" => "0.5", "100" => "<0.5");
-my %threshold_coded_hash = ("97" => "1", "975" => "4", "98" => "2", "985" => "5", "99" => "3", "995" => "6", "100" => "7");
+my $accno_seqs_file = $user_dir . "/" . "source_" . $run_id . "_names";
+# read in duplicates from vsearch --fastx_uniques and vsearch length coverage clustering (seq_id, parent_seq_id, cluster_name)
+my $duplicate_seqs_file1 = $user_dir . "/" . "duplic_seqs.txt";
+# read in duplicates from 0.5% RepS clustering (RepS_id, duplicate_seq_id)
+my $duplicate_seqs_file2 = $user_dir . "/" . "seq_mappings.txt";
+
+my %threshold_hash = ("03" => "3.0", "025" => "2.5", "02" => "2.0", "015" => "1.5", "01" => "1.0", "005" => "0.5");
+my %threshold_coded_hash = ("03" => "1", "025" => "4", "02" => "2", "015" => "5", "01" => "3", "005" => "6");
 
 # get compound and SH mappings
 my %sh_ucl_hash = ();
@@ -61,14 +66,39 @@ while (<INFILE_COMPOUNDS>) {
 }
 close INFILE_COMPOUNDS;
 
-# read in duplicate seqs
+# read in duplicate seqs 1
 my %seq_duplicate_hash = ();
-open (INFILE_DUPL, $duplicate_seqs_file);
+open (INFILE_DUPL, $duplicate_seqs_file1);
 while (<INFILE_DUPL>) {
     chomp $_;
     my @fields = split("\t", $_);
-    if ($fields[0] ne $fields[1]) {
-        $seq_duplicate_hash{$fields[0]} = $fields[1];
+    if (!defined($seq_duplicate_hash{$fields[1]})) {
+        $seq_duplicate_hash{$fields[1]} = $fields[0];
+    } else {
+        $seq_duplicate_hash{$fields[1]} = $seq_duplicate_hash{$fields[1]} . "," . $fields[0];
+    }
+}
+close INFILE_DUPL;
+
+# read in duplicate seqs 2
+open (INFILE_DUPL, $duplicate_seqs_file2);
+while (<INFILE_DUPL>) {
+    chomp $_;
+    my @fields = split(",", $_);
+    if (!defined($seq_duplicate_hash{$fields[0]})) {
+        if (defined($seq_duplicate_hash{$fields[1]})) {
+            $seq_duplicate_hash{$fields[0]} = $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
+            delete($seq_duplicate_hash{$fields[1]});
+        } else {
+            $seq_duplicate_hash{$fields[0]} = $fields[1];
+        }
+    } else {
+        if (defined($seq_duplicate_hash{$fields[1]})) {
+            $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
+            delete($seq_duplicate_hash{$fields[1]});
+        } else {
+            $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1];
+        }
     }
 }
 close INFILE_DUPL;
@@ -89,8 +119,7 @@ close INFILE_ACCNOS;
 my $new_sh_counter = 0;
 my $new_singleton_counter = 0;
 
-## TODO: Add 995 as well once ref. data is updated
-my @thresholds = ("97", "975", "98", "985", "99");
+my @thresholds = ("03", "025", "02", "015", "01", "005");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_" . $threshold . ".txt";
     my $matches_outfile = $matches_dir . "/" . "matches_out_" . $threshold . ".csv";
@@ -166,7 +195,7 @@ foreach my $threshold (@thresholds) {
             } else {
                 print MATCHES_OUT "\t";
             }
-            $duplicate_sh_code = $new_singleton_counter;
+            $duplicate_sh_code = "s" . $new_singleton_counter;
         }
         if (!defined($fields[3])) {
             print "Not defined - $seq_id\n";
@@ -186,13 +215,11 @@ foreach my $threshold (@thresholds) {
         if (defined($seq_duplicate_hash{$fields[0]})) {
             my @fields2 = split(",", $seq_duplicate_hash{$fields[0]});
             for (my $k=0; $k<scalar(@fields2); $k++) {
-                if ($k > 0) {
-                    my $dupl = $fields2[$k];
-                    $dupl =~ s/i//g;
-                    # print each duplicate in a separate row
-                    print MATCHES_OUT $dupl . "\t" . $seq_id_hash{$dupl} . "\t";
-                    print MATCHES_OUT "duplicate_of_" . $seq_id_hash{$seq_id} . "\t" . $duplicate_sh_code . "\t" . $duplicate_taxonomy . "\t" . $duplicate_ucl_code . "\n";
-                }
+                my $dupl = $fields2[$k];
+                $dupl =~ s/i//g;
+                # print each duplicate in a separate row
+                print MATCHES_OUT $dupl . "\t" . $seq_id_hash{$dupl} . "\t";
+                print MATCHES_OUT "duplicate_of_" . $seq_id_hash{$seq_id} . "\t" . $duplicate_sh_code . "\t" . $duplicate_taxonomy . "\t" . $duplicate_ucl_code . "\t" . $ucl_taxonomy_hash{$duplicate_ucl_code} . "\n";
             }
         }
     }

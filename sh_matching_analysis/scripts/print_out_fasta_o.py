@@ -102,9 +102,10 @@ if region == "itsfull":
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.\n")
+                    logging.info(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
             else:
                 ex_o_ct += 1
+                logging.info(f"{row[0]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     with open(ex_file, "a") as ex, open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
@@ -118,9 +119,10 @@ elif region == "its2":
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.\n")
+                    logging.info(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
             else:
                 ex_o_ct += 1
+                logging.info(f"{row[0]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 
 # get ITS sequence from full file into hash
 with open(full_file, "r") as handle:
@@ -153,12 +155,16 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile_o, "r") as h
                     ex.write(f"{record_id}\tPRINT_FAS_O\tSequence too short.\n")
             else:
                 no_coverage_count += 1
+                ex.write(f"{record_id}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.\n")
 
 logging.info(f"PRINT_FAS_O\tNo coverage for {no_coverage_count} sequences.")
 logging.info(
     f"PRINT_FAS_O\tNo. of full seqs: {full_counter}; "
     f"No of ITS2 seqs: {its2_counter}"
 )
+
+# TODO: read in no_detections.txt files for both runs and print out nfo about excluded sequences
+
 logging.info(
     f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"
 )

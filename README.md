@@ -13,7 +13,6 @@ The script expects input files in FASTA format. Outdata files are described in [
 ### Pre-requisites
 
 * [Singularity](https://sylabs.io/singularity/) - install Singularity (tested with version 3.5) and obtain API key for remote build
-* [USEARCH](https://www.drive5.com/usearch/download.html) - download USEARCH binary (usearch11.0.667_i86linux32) and place it in the main folder
 
 ### Setup steps
 

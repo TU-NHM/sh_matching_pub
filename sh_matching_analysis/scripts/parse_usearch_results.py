@@ -17,7 +17,7 @@ if not run_id.isdigit():
     raise ValueError("Run id is not numeric", run_id)
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
-infile = user_dir / "iupac_out.fasta"
+infile = user_dir / "iupac_out_full.fasta"
 outfile1 = user_dir / "hits.fasta"
 outfile2 = user_dir / "nohits.fasta"
 outfile3 = user_dir / "hits.txt"
