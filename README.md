@@ -1,5 +1,5 @@
 # sh_matching
-EOSC-Nordic service preparations (SH matching)
+SH MATCHING analysis tool
 
 **NB! master branch is used as development branch. Please check out [Releases](https://github.com/TU-NHM/sh_matching_pub/releases) to download a specific version of the SH matching tool.**
 
@@ -33,7 +33,7 @@ The script expects input files in FASTA format. Outdata files are described in [
     mkdir outdata
     ```
 
-## SH matching: running the analysis (OPTIONAL: This could be done through sbatch slurm scripts)
+## Running the analysis
 
 **NB! The script expects input files in FASTA format, named as source_[run_id] and placed in indata/ directory. Outdata files are described in [sh_matching_analysis/readme.txt](https://github.com/TU-NHM/sh_matching_pub/blob/master/sh_matching_analysis/readme.txt).**
 
@@ -41,3 +41,7 @@ The script expects input files in FASTA format. Outdata files are described in [
     ```console
     ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes
     ```
+
+## Funding
+
+The work is supported by [EOSC-Nordic](https://eosc-nordic.eu/) and the Estonian Research Council grant (PRG1170).
