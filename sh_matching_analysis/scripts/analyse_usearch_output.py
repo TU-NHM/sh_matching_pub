@@ -27,7 +27,6 @@ if not threshold.isdigit():
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 sh2compound_file = "/sh_matching/data/sh2compound_mapping.txt"
-# sh2compound_file = "/Users/kessy/GitHubRepos/sh_matching_pub/sh_matching_analysis/data/sh2compound_mapping.txt"
 matches_dir = user_dir / "matches"
 matches_file = matches_dir / f"matches_{threshold}.txt"
 
@@ -78,6 +77,7 @@ glob_match_folders = f"{user_dir}/compounds/*_folder"
 folder_list = glob.glob(glob_match_folders)
 for folder in folder_list:
     compound_name = folder[:-7].replace("compounds", "compounds/calc_distm_out")
+    # read in clusters
     glob_match_files = f"{folder}/calc_distm_out/*_out_{threshold}"
     file_list = glob.glob(glob_match_files)
     for file in file_list:
@@ -85,6 +85,15 @@ for folder in folder_list:
             dataReader = csv.reader(f, delimiter="\t")
             for row in dataReader:
                 seq_ucl_mapping_dict[row[1]] = f"{compound_name}_out_{threshold}"
+    # read in singletons
+    s_list_file = f"{folder}/singletons.txt"
+    with open (s_list_file, "r") as l:
+        dataReader = csv.reader(l, delimiter="\t")
+        for row in dataReader:
+            s_file = f"{folder}/singletons/{row[0]}"
+            with open(s_file, "r") as handle:
+                for record in SeqIO.parse(handle, "fasta"):
+                    seq_ucl_mapping_dict[str(record.id)] = f"{compound_name}_out_{threshold}"
 
 # go through usearch output, write out BC style clustering results
 tmp_file = user_dir / "compounds" / "tmp.txt"
