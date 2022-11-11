@@ -58,7 +58,10 @@ with open(outfile, "w") as o:
                             if row[0] in bh_mapping_dict:
                                 one_line_str_dict[row[0]] += "\t" + bh_mapping_dict[row[0]] + "\t" + bh_sim_dict[row[0]]
                             else:
-                                one_line_str_dict[row[0]] += "\t" + "\t"
+                                if row[7] and row[7] in bh_mapping_dict:
+                                    one_line_str_dict[row[0]] += "\t" + bh_mapping_dict[row[7]] + "\t" + bh_sim_dict[row[7]]
+                                else:
+                                    one_line_str_dict[row[0]] += "\t" + "\t"
                             one_line_str_dict[row[0]] += "\n"
                     else:
                         ## status (2.0) SH code (2.0)   SH/compound taxonomy (2.0)
@@ -84,7 +87,10 @@ with open(outfile, "w") as o:
                             if row[0] in bh_mapping_dict:
                                 one_line_str_dict[row[0]] += "\t" + bh_mapping_dict[row[0]] + "\t" + bh_sim_dict[row[0]]
                             else:
-                                one_line_str_dict[row[0]] += "\t" + "\t"
+                                if row[5] and row[5] in bh_mapping_dict:
+                                    one_line_str_dict[row[0]] += "\t" + bh_mapping_dict[row[5]] + "\t" + bh_sim_dict[row[5]]
+                                else:
+                                    one_line_str_dict[row[0]] += "\t" + "\t"
                             one_line_str_dict[row[0]] += "\n"
                         else:
                             ## status (2.0)    SH code (2.0)
