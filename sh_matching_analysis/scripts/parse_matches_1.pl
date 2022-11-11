@@ -76,7 +76,7 @@ my @thresholds = ("03", "025", "02", "015", "01", "005");
 foreach my $threshold (@thresholds) {
     my $matches_file = $matches_dir . "/" . "matches_1_" . $threshold . ".txt";
     my $matches_outfile = $matches_dir . "/" . "matches_1_out_" . $threshold . ".csv";
-    my $header = "seq_id_tmp\tseq_accno\tstatus (" . $threshold_hash{$threshold} . ")\tSH code (" . $threshold_hash{$threshold} . ")\tcompound_cl_code (" . $threshold_hash{$threshold} . ")\n";
+    my $header = "seq_id_tmp\tseq_accno\tstatus (" . $threshold_hash{$threshold} . ")\tSH code (" . $threshold_hash{$threshold} . ")\tcompound_cl_code (" . $threshold_hash{$threshold} . ")\tduplicate_of_seq_id_tmp\tduplicate_of_seq_accno\n";
 
     my $new_sh_counter_th = 0;
     my $new_sh_seq_counter_th = 0;
@@ -98,6 +98,7 @@ foreach my $threshold (@thresholds) {
 
         print MATCHES_OUT $seq_id . "\t" . $seq_id_hash{$seq_id} . "\t";
 
+        my $duplicate_status = "";
         my $duplicate_sh_code = "";
         my $duplicate_ucl_code = "";
 
@@ -114,11 +115,13 @@ foreach my $threshold (@thresholds) {
             }
             print MATCHES_OUT "new_sh_in\tn" . $new_sh_code . "\t";
             $duplicate_sh_code = "n" . $new_sh_code;
+            $duplicate_status = "new_sh_in";
         } elsif ($fields[2] eq "singleton") {
             $new_singleton_counter++;
             $new_singleton_counter_th++;
             print MATCHES_OUT "new_singleton_in\tns". $new_singleton_counter . "\t";
             $duplicate_sh_code = "ns" . $new_singleton_counter;
+            $duplicate_status = "new_singleton_in";
         }
         if (!defined($fields[3])) {
             print "Not defined - $seq_id\n";
@@ -127,7 +130,7 @@ foreach my $threshold (@thresholds) {
             print MATCHES_OUT $fields[3] . "\t";
             $duplicate_ucl_code = $fields[3];
         }
-        print MATCHES_OUT "\n";
+        print MATCHES_OUT "\t\t\n";
         # check duplicates
         if (defined($seq_duplicate_hash{$fields[0]})) {
             my @fields2 = split(",", $seq_duplicate_hash{$fields[0]});
@@ -135,8 +138,9 @@ foreach my $threshold (@thresholds) {
                 my $dupl = $fields2[$k];
                 $dupl =~ s/i//g;
                 # print each duplicate in a separate row
+                print $dupl . "\t" . $seq_id_hash{$dupl} . "\tDuplicate of " . $seq_id_hash{$seq_id} . "\n";
                 print MATCHES_OUT $dupl . "\t" . $seq_id_hash{$dupl} . "\t";
-                print MATCHES_OUT "duplicate_of_" . $seq_id_hash{$seq_id} . "\t" . $duplicate_sh_code . "\t" . $duplicate_ucl_code . "\n";
+                print MATCHES_OUT $duplicate_status . "\t" . $duplicate_sh_code . "\t" . $duplicate_ucl_code . "\t" . $seq_id . "\t" . $seq_id_hash{$seq_id}. "\n";
             }
         }
     }
