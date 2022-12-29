@@ -1,5 +1,7 @@
-# sh_matching
-SH MATCHING analysis tool
+# SH MATCHING analysis tool
+
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-blue?style=flat&logo=singularity)](https://sylabs.io/docs/)
+[![Github_Status_Badge](https://img.shields.io/badge/GitHub-2.0.0-blue.svg)](https://github.com/TU-NHM/sh_matching_pub)
 
 **NB! master branch is used as development branch. Please check out [Releases](https://github.com/TU-NHM/sh_matching_pub/releases) to download a specific version of the SH matching tool.**
 
@@ -37,7 +39,7 @@ The script expects input files in FASTA format. Outdata files are described in [
 
 **NB! The script expects input files in FASTA format, named as source_[run_id] and placed in indata/ directory. Outdata files are described in [sh_matching_analysis/readme.txt](https://github.com/TU-NHM/sh_matching_pub/blob/master/sh_matching_analysis/readme.txt).**
 
-4. Run the pipeline using SIF (example data with run_id=11, region=itsfull, and itsx_step=yes)
+4. Run the pipeline using SIF (example data with run_id=11, region=itsfull[default]|its2, and itsx_step=yes[default]|no)
     ```console
     ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes
     ```
