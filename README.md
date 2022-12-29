@@ -2,6 +2,7 @@
 
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-blue?style=flat&logo=singularity)](https://sylabs.io/docs/)
 [![Github_Status_Badge](https://img.shields.io/badge/GitHub-2.0.0-blue.svg)](https://github.com/TU-NHM/sh_matching_pub)
+[![GitHub license](https://img.shields.io/github/license/TU-NHM/sh_matching_pub)](https://github.com/TU-NHM/sh_matching_pub/blob/master/LICENSE.md)
 
 **NB! master branch is used as development branch. Please check out [Releases](https://github.com/TU-NHM/sh_matching_pub/releases) to download a specific version of the SH matching tool.**
 
@@ -9,6 +10,12 @@ Developed as part of [EOSC-Nordic](https://www.eosc-nordic.eu/) project (task 5.
 
 The script expects input files in FASTA format. Outdata files are described in [sh_matching_analysis/readme.txt](https://github.com/TU-NHM/sh_matching_pub/blob/master/sh_matching_analysis/readme.txt).
 
+## Third-party software used by this tool
+
+* [USEARCH](https://www.drive5.com/usearch/)
+* [VSEARCH](https://github.com/torognes/vsearch)
+* [ITSx](https://microbiology.se/software/itsx/)
+* [KronaTools](https://github.com/marbl/Krona/wiki/KronaTools)
 
 ## Setup
 
