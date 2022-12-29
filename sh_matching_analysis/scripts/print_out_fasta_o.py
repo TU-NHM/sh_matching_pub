@@ -69,7 +69,6 @@ if region == "itsfull":
 elif region == "its2":
     len_limit = 100
     with open(pos_file_f) as pos:
-        # TODO - csv.DictReader possibility
         dataReader_pos = csv.reader(pos, delimiter="\t")
         for row in dataReader_pos:
             if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
@@ -163,7 +162,7 @@ logging.info(
     f"No of ITS2 seqs: {its2_counter}"
 )
 
-# TODO: read in no_detections.txt files for both runs and print out nfo about excluded sequences
+# TODO: read in no_detections.txt files for both runs and print out info about excluded sequences
 
 logging.info(
     f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"

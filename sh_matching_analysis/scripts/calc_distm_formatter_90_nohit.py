@@ -24,11 +24,6 @@ uclust_dir = user_dir / "clusters"
 out_dir = uclust_dir / name_folder / "calc_distm_out"
 cl_tmp_file = uclust_dir / name_folder / "tmp.txt"
 
-# log_file = user_dir / f"err_{run_id}.log"
-# logging.basicConfig(
-#     filename=log_file, filemode="a", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level="INFO",
-# )
-
 usearch_program = "/sh_matching/programs/usearch"
 
 # get cluster codes

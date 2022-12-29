@@ -3,11 +3,12 @@
 ## running the script - ./run_pipeline.sh <run_id>
 
 ## TODO LIST:
-## 1. Generate new HTML output files
-## 2. Check out log output (some steps are not logged at all)
-## 3. Check if all excluded sequences are reported in del file
-## 4. improve commenting inside the code
+## 1. Check out log output (some steps are not logged at all)
+## 2. Check if all excluded sequences are reported in del file
+## 3. improve commenting inside the code
+## 4. Remove unnecessary files from output during the analysis run
 
+## check if run id has been provided
 if [ -z "$1" ]
     then
         echo "No run_id argument supplied!"
@@ -57,8 +58,11 @@ if [ -d "$user_dir" ]
 fi
 mkdir "$user_dir"
 
+## error log file
 err_log="$user_dir/err_$run_id.log"
 touch "$err_log"
+
+## output sequences to be excluded in various analysis steps
 ex_log="$user_dir/excluded_$run_id.txt"
 touch "$ex_log"
 
@@ -158,6 +162,7 @@ rm "$user_dir/in_95_pre.fasta"
 rm "$user_dir/in_90_pre.fasta"
 rm "$user_dir/in_80_pre.fasta"
 
+## create a list of useach clusters
 cd "$clusters_pre_dir/clusters/"
 touch "$clusters_pre_dir/tmp.txt"
 for nbr1 in {0..9}
@@ -175,6 +180,7 @@ for nbr1 in {0..9}
         done
     done
 
+## create a list of useach singletons
 cd "$clusters_pre_dir/singletons/"
 ls Singleton* > "$clusters_pre_dir/singletons.txt"
 cd $pwd
@@ -182,7 +188,7 @@ cd $pwd
 ## write vsearch clustering duplicates into duplic_seqs.txt file
 python3 "$script_dir/usearch_parser.py" "$run_id"
 
-## go through 80% uclust clusters and run 90% usearch clustering if needed (if >16000 in cluster size)
+## go through 80% uclust clusters and run 97% usearch clustering if needed (if >16000 in cluster size)
 ## 2. calculate 0.5% clusters (USEARCH calc_distmx & cluster_aggd)
 touch "$user_dir/seq_mappings.txt"
 rm -fr "$clusters_pre_dir/clusters/calc_distm_out"
@@ -223,15 +229,13 @@ python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
 ## END NEW: preclustering steps to keep only 0.5% representatives
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
-## TODO: replace with vsearch
 pushd "$user_dir"
-# "$program_dir/usearch" -usearch_global "$user_dir/core_reps_pre.fasta" -db "$data_dir/sanger_refs_sh_full.fasta" -strand plus -id 0.8 -threads 8 -uc "$user_dir/closedref.80.map.uc" -maxaccepts 3
 "$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$data_dir/sanger_refs_sh_full.fasta" --strand plus --id 0.8 --threads 8 --iddef 0 --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
 popd
 
 python3 "$script_dir/parse_usearch_results.py" "$run_id"
 
-## HITS: create compound clusters - Create compound clusters (!of core dataset only!) with user's sequences added to the existing data.
+## HITS: Create compound clusters (!of core dataset only!) with user's sequences added to the existing data.
 
 echo "Creating compound clusters"
 mkdir "$user_dir/compounds"
@@ -239,7 +243,7 @@ mkdir "$user_dir/matches"
 
 python3 "$script_dir/create_compound_clusters.py" "$run_id"
 
-## go through compound clusters and run 90% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
+## go through compound clusters and run 97% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
 rm -fr "$user_dir/compounds/calc_distm_out"
 mkdir "$user_dir/compounds/calc_distm_out"
 
@@ -337,7 +341,7 @@ if [ -f "$user_dir/nohits.fasta" ]
                 python3 "$script_dir/clusterparser_preclust_final.py" "$run_id"
 
                 ## NOHITS: Run usearch "calc_distmx & cluster_aggd" for NOHITS compound clusters
-                ## go through compound clusters and run 90% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
+                ## go through compound clusters and run 97% usearch clustering if needed (if >16000 in cluster size) -> calc 3.0% distance matrix to form SHs based on these
                 rm -fr "$clusters_dir/clusters/calc_distm_out"
                 mkdir "$clusters_dir/clusters/calc_distm_out"
 
@@ -444,10 +448,10 @@ zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html ma
 mv source_"$run_id".zip "$outdata_dir"/
 popd
 
-# ## clean user working dir
-# if [ -d "$user_dir" ]
-#   then
-#       rm -fr "$user_dir"
-# fi
+## clean user working dir
+if [ -d "$user_dir" ]
+  then
+      rm -fr "$user_dir"
+fi
 
 echo "End"
