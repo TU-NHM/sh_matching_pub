@@ -78,7 +78,7 @@ seq_taxonomy_dict = {}
 seq_taxon_count = {}
 seq_taxon_sh_count = {}
 
-with open(outfile, "w") as o, open(matches_file) as m, open(matches_1_file) as m1:
+with open(outfile, "w") as o, open(matches_file) as m:
     # print HTML file header
     o.write(f"<!DOCTYPE html><html>\n{style_tag}\n<head>\n<title>SH matching analysis: source_{run_id}</title>\n<head>\n<body>\n")
     o.write(f"<h5>SH matching analysis: source_{run_id}</h5>\n")
@@ -245,51 +245,53 @@ with open(outfile, "w") as o, open(matches_file) as m, open(matches_1_file) as m
                                                     seq_taxon_sh_count[tax_name_s] = {}
                                                     seq_taxon_sh_count[tax_name_s][sh_code] = 1
 
-    # count sequences and SHs in new compound clusters
-    dataReader_m1 = csv.reader(m1, delimiter="\t")
-    row_count = 0
-    for row in dataReader_m1:
-        row_count += 1
-        if row_count > 1:
-            record_count += 1
+    if matches_1_file.exists():
+        with open(matches_1_file) as m1:
+            # count sequences and SHs in new compound clusters
+            dataReader_m1 = csv.reader(m1, delimiter="\t")
+            row_count = 0
+            for row in dataReader_m1:
+                row_count += 1
+                if row_count > 1:
+                    record_count += 1
 
-            status = row[2]
-            sh_code = row[3]
-            compound_code = row[4]
+                    status = row[2]
+                    sh_code = row[3]
+                    compound_code = row[4]
 
-            # count new SHs
-            if status == "new_sh_in":
-                if sh_code in nc_shs_hash["new_sh_in"]:
-                    nc_shs_hash["new_sh_in"][sh_code] += 1
-                else:
-                    nc_shs_hash["new_sh_in"][sh_code] = 1
-                    nc_shs_count += 1
-                nc_seqs_count += 1
-            elif status == "new_singleton_in":
-                if sh_code in nc_shs_hash["new_singleton_in"]:
-                    nc_shs_hash["new_singleton_in"][sh_code] += 1
-                else:
-                    nc_shs_hash["new_singleton_in"][sh_code] = 1
-                    nc_singleton_shs_count += 1
-                nc_singleton_seqs_count += 1
-            # count new compounds
-            if status == "new_sh_in":
-                if compound_code in nc_ucl_hash["new_sh_in"]:
-                    nc_ucl_hash["new_sh_in"][compound_code] += 1
-                else:
-                    nc_ucl_hash["new_sh_in"][compound_code] = 1
-                    nc_ucl_count += 1
-            elif status == "new_singleton_in":
-                if compound_code in nc_ucl_hash["new_singleton_in"]:
-                    nc_ucl_hash["new_singleton_in"][compound_code] += 1
-                else:
-                    nc_ucl_hash["new_singleton_in"][compound_code] = 1
-                    nc_singleton_ucl_count += 1
-            if not compound_code in ucl_hash["total"]:
-                ucl_hash["total"][compound_code] = 1
-                total_ucl_count += 1
-            else:
-                ucl_hash["total"][compound_code] += 1
+                    # count new SHs
+                    if status == "new_sh_in":
+                        if sh_code in nc_shs_hash["new_sh_in"]:
+                            nc_shs_hash["new_sh_in"][sh_code] += 1
+                        else:
+                            nc_shs_hash["new_sh_in"][sh_code] = 1
+                            nc_shs_count += 1
+                        nc_seqs_count += 1
+                    elif status == "new_singleton_in":
+                        if sh_code in nc_shs_hash["new_singleton_in"]:
+                            nc_shs_hash["new_singleton_in"][sh_code] += 1
+                        else:
+                            nc_shs_hash["new_singleton_in"][sh_code] = 1
+                            nc_singleton_shs_count += 1
+                        nc_singleton_seqs_count += 1
+                    # count new compounds
+                    if status == "new_sh_in":
+                        if compound_code in nc_ucl_hash["new_sh_in"]:
+                            nc_ucl_hash["new_sh_in"][compound_code] += 1
+                        else:
+                            nc_ucl_hash["new_sh_in"][compound_code] = 1
+                            nc_ucl_count += 1
+                    elif status == "new_singleton_in":
+                        if compound_code in nc_ucl_hash["new_singleton_in"]:
+                            nc_ucl_hash["new_singleton_in"][compound_code] += 1
+                        else:
+                            nc_ucl_hash["new_singleton_in"][compound_code] = 1
+                            nc_singleton_ucl_count += 1
+                    if not compound_code in ucl_hash["total"]:
+                        ucl_hash["total"][compound_code] = 1
+                        total_ucl_count += 1
+                    else:
+                        ucl_hash["total"][compound_code] += 1
 
     # sequence statistics tab
     o.write("<h4><b>Statistics</b></h4>\n")

@@ -190,7 +190,7 @@ with open(tmp_uc_infile) as t, open(matches_file, "w") as o:
                                 o.write("new cluster\t" + sh_ucl_dict[subject_sh] + "\t" + check_output + "\n")
                             else:
                                 o.write("present\t" + sh_ucl_dict[subject_sh] + "\t" + "\n")
-                                logging.info(f"US\tcorrect RepS not matched for {query}\n")
+                                logging.info(f"US\tcorrect RepS not matched for {query}")
                     else:
                         o.write("missing\t\t\n")
             else:
