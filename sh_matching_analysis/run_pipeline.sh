@@ -443,7 +443,7 @@ $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_03.html "$user_dir"/kro
 
 ## zip to outdata dir
 pushd "$user_dir"
-szip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html closedref.80.map.uc /sh_matching/readme.txt
+zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html closedref.80.map.uc /sh_matching/readme.txt
 
 mv source_"$run_id".zip "$outdata_dir"/
 popd
