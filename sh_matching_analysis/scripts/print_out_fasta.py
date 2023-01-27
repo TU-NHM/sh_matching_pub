@@ -65,7 +65,7 @@ if region == "itsfull":
                     ex.write(f"{row[0]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
             else:
                 ex_f_ct += 1
-                logging.info(f"{row[0]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.\n")
+                logging.info(f"{row[0]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     len_limit = 100
     with open(ex_file, "a") as ex, open(pos_file) as pos:
