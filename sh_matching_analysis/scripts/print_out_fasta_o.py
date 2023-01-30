@@ -166,12 +166,12 @@ logging.info(
 
 # read in no_detections.txt files for both runs and print out info about excluded sequences
 no_detect_f_set = set()
-with (open no_detect_file_f, "r") as det:
+with open (no_detect_file_f, "r") as det:
     dataReader = csv.reader(det, delimiter="\t")
     for row in dataReader:
         no_detect_f_set.add(row[0])
 
-with open(ex_file, "a") as ex, (open no_detect_file_o, "r") as det:
+with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
     dataReader = csv.reader(det, delimiter="\t")
     for row in dataReader:
         if row[0] in no_detect_f_set:
