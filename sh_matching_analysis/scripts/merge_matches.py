@@ -29,7 +29,7 @@ with open(best_hits_file) as bh:
         if row[0] == "H":
             query_id = row[8].replace("i", "")
             subject_fields = row[9].split("_")
-            plutof_seq_url = "https://plutof.ut.ee/#/sequence/view/" + str(subject_fields[0].replace("i", ""))
+            plutof_seq_url = "https://app.plutof.ut.ee/sequence/view/" + str(subject_fields[0].replace("i", ""))
             bh_mapping_dict[query_id] = plutof_seq_url
             bh_sim_dict[query_id] = str(row[3])
 

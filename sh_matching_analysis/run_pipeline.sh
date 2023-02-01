@@ -230,7 +230,7 @@ python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
-"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$data_dir/sanger_refs_sh_full.fasta" --strand plus --id 0.8 --threads 8 --iddef 0 --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
+"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$data_dir/sanger_refs_sh_full.fasta" --strand plus --id 0.8 --threads 8 --iddef 0 --gapopen 0I/0E --gapext 2I/1E --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
 popd
 
 python3 "$script_dir/parse_usearch_results.py" "$run_id"
@@ -443,15 +443,15 @@ $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_03.html "$user_dir"/kro
 
 ## zip to outdata dir
 pushd "$user_dir"
-zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html /sh_matching/readme.txt
+zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html matches/matches_1_out_*.csv err_"$run_id".log excluded_"$run_id".txt source_"$run_id"_fastanames source_"$run_id"_names krona_*.html closedref.80.map.uc /sh_matching/readme.txt
 
 mv source_"$run_id".zip "$outdata_dir"/
 popd
 
-## clean user working dir
-if [ -d "$user_dir" ]
-  then
-      rm -fr "$user_dir"
-fi
+# ## clean user working dir
+# if [ -d "$user_dir" ]
+#   then
+#       rm -fr "$user_dir"
+# fi
 
 echo "End"

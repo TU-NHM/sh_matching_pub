@@ -29,6 +29,8 @@ infile_o = itsx_dir_o / "itsx_sh_out_o.ITS2.full_and_partial.fasta"
 infile_f = itsx_dir_f / "itsx_sh_out.ITS2.full_and_partial.fasta"
 pos_file_o = itsx_dir_o / "itsx_sh_out_o.positions.txt"
 pos_file_f = itsx_dir_f / "itsx_sh_out.positions.txt"
+no_detect_file_o = itsx_dir_o / "itsx_sh_out_o_no_detections.txt"
+no_detect_file_f = itsx_dir_f / "itsx_sh_out_no_detections.txt"
 full_file = itsx_dir_o / "itsx_sh_out_o.full_and_partial.fasta"
 outfile = user_dir / "seqs_out_2.fasta"
 
@@ -87,7 +89,7 @@ with open(infile_f, "r") as handle:
 
 # open excluded seq file
 if region == "itsfull":
-    with open(ex_file, "a") as ex, open(pos_file_o) as pos_o:
+    with open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
         dataReader_pos_o = csv.reader(pos_o, delimiter="\t")
         for row in dataReader_pos_o:
@@ -106,7 +108,7 @@ if region == "itsfull":
                 ex_o_ct += 1
                 logging.info(f"{row[0]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
-    with open(ex_file, "a") as ex, open(pos_file_o) as pos_o:
+    with open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
         dataReader_pos_o = csv.reader(pos_o, delimiter="\t")
         for row in dataReader_pos_o:
@@ -162,7 +164,18 @@ logging.info(
     f"No of ITS2 seqs: {its2_counter}"
 )
 
-# TODO: read in no_detections.txt files for both runs and print out info about excluded sequences
+# read in no_detections.txt files for both runs and print out info about excluded sequences
+no_detect_f_set = set()
+with open (no_detect_file_f, "r") as det:
+    dataReader = csv.reader(det, delimiter="\t")
+    for row in dataReader:
+        no_detect_f_set.add(row[0])
+
+with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
+    dataReader = csv.reader(det, delimiter="\t")
+    for row in dataReader:
+        if row[0] in no_detect_f_set:
+            ex.write(f"{record_id}\tPRINT_FAS_O\tSequence not detected as ITS by ITSx.\n")
 
 logging.info(
     f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"
