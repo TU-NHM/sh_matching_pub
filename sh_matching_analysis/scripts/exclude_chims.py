@@ -7,7 +7,7 @@ from pathlib import Path
 
 from Bio import SeqIO
 
-parser = argparse.ArgumentParser(description="Script to exclude chimeras identified by uchime and vsearch")
+parser = argparse.ArgumentParser(description="Script to exclude chimeras identified by vsearch")
 parser.add_argument("run_id", help="Need run id in numeric format!")
 parser.add_argument("region", help="Need region (either its2 or itsfull)!")
 args = parser.parse_args()

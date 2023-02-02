@@ -100,15 +100,13 @@ else
     popd
 fi
 
-## Chimera filtering using uchime and vsearch tools
+## Chimera filtering using vsearch
 pushd "$user_dir"
-## uchime
-"$program_dir/usearch" -uchime2_ref "$user_dir/seqs_out.fasta" -db "$data_dir/sanger_refs_sh.fasta" -uchimeout "$user_dir/uchime_out.txt" -strand plus -mode high_confidence
 ## vsearch usearch_global
 "$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/seqs_out.fasta" --db "$data_dir/sanger_refs_sh.fasta" --strand plus --id .75 --threads 8 --uc "$user_dir/usearch_global.full.75.map.uc" --blast6out "$user_dir/usearch_global.full.75.blast6out.txt" --output_no_hits
 popd
 
-## handle all potentially chimeric sequences from uchime and usearch_global
+## handle all potentially chimeric sequences from usearch_global
 python3 "$script_dir/exclude_chims.py" "$run_id" "$region"
 
 ## Additional quality controls - Remove low quality sequences (too short or with too many non-IUPAC symbols)
