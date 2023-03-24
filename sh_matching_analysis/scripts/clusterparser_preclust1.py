@@ -6,6 +6,8 @@ from pathlib import Path
 
 from Bio import SeqIO
 
+csv.field_size_limit(sys.maxsize)
+
 parser = argparse.ArgumentParser(description="Script to parse USEARCH clustering output (97) for next step clustering (95)")
 parser.add_argument("run_id", help="Need run id in numeric format!")
 args = parser.parse_args()

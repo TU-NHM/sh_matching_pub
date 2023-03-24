@@ -33,7 +33,7 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
     mv usearch11.0.667_i86linux32 /sh_matching/programs/usearch
     chmod 0111 /sh_matching/programs/usearch
 
-    # vsearch 2.21.1
+    # vsearch 2.22.1
     # apt install -y vsearch=2.22.1
     wget https://github.com/torognes/vsearch/releases/download/v2.22.1/vsearch-2.22.1-linux-x86_64.tar.gz
     tar -xvf vsearch-2.22.1-linux-x86_64.tar.gz -C /sh_matching/programs/
@@ -55,11 +55,16 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
     perl install.pl --prefix ../krona
     cd /
 
-    # Get database files (https://app.plutof.ut.ee/filerepository/view/5582954)
-    wget https://files.plutof.ut.ee/public/orig/9C/FD/9CFD7C58956E5331F1497853359E874DEB639B17B04DB264C8828D04FA964A8F.zip
-    mv 9CFD7C58956E5331F1497853359E874DEB639B17B04DB264C8828D04FA964A8F.zip sh_matching_data_0_5.zip
+    # Get database files (https://app.plutof.ut.ee/filerepository/view/5612493)
+    wget https://files.plutof.ut.ee/public/orig/1C/D8/1CD8036BE151642FED7D88C1B589B633393C964B6DFB37016A6040F4988E22DE.zip
+    mv 1CD8036BE151642FED7D88C1B589B633393C964B6DFB37016A6040F4988E22DE.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
+    # create udb formatted dbs for faster processing of user files
+    cd /sh_matching/data/
+    apt install -y vsearch
+    vsearch --makeudb_usearch sanger_refs_sh.fasta --output sanger_refs_sh.udb
+    vsearch --makeudb_usearch sanger_refs_sh_full.fasta --output sanger_refs_sh_full.udb
     
 %environment
     export LC_ALL=C
