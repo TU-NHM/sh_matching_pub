@@ -38,6 +38,7 @@ pwd=$(pwd)
 
 script_dir="/sh_matching/scripts"
 data_dir="/sh_matching/data"
+udb_data_dir="$pwd/data_udb"
 outdata_dir="$pwd/outdata"
 user_dir="$pwd/userdir/$run_id"
 clusters_pre_dir="$user_dir/clusters_pre"
@@ -103,7 +104,7 @@ fi
 ## Chimera filtering using vsearch
 pushd "$user_dir"
 ## vsearch usearch_global
-"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/seqs_out.fasta" --db "$data_dir/sanger_refs_sh.udb" --strand plus --id .75 --threads 8 --uc "$user_dir/usearch_global.full.75.map.uc" --blast6out "$user_dir/usearch_global.full.75.blast6out.txt" --output_no_hits
+"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/seqs_out.fasta" --db "$udb_data_dir/sanger_refs_sh.udb" --strand plus --id .75 --threads 8 --uc "$user_dir/usearch_global.full.75.map.uc" --blast6out "$user_dir/usearch_global.full.75.blast6out.txt" --output_no_hits
 popd
 
 ## handle all potentially chimeric sequences from usearch_global
@@ -228,7 +229,7 @@ python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
-"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$data_dir/sanger_refs_sh_full.udb" --strand plus --id 0.8 --threads 8 --iddef 0 --gapopen 0I/0E --gapext 2I/1E --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
+"$program_dir/vsearch/bin/vsearch" --usearch_global "$user_dir/core_reps_pre.fasta" --db "$udb_data_dir/sanger_refs_sh_full.udb" --strand plus --id 0.8 --threads 8 --iddef 0 --gapopen 0I/0E --gapext 2I/1E --uc "$user_dir/closedref.80.map.uc" --maxaccepts 3 --maxrejects 0
 popd
 
 python3 "$script_dir/parse_usearch_results.py" "$run_id"

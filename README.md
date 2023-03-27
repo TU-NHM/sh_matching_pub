@@ -42,11 +42,24 @@ The script expects input files in FASTA format. Outdata files are described in [
     mkdir outdata
     ```
 
+4. Download FASTA dbs (https://app.plutof.ut.ee/filerepository/view/5613027) and create UDB formatted dbs
+    ```console
+    wget https://files.plutof.ut.ee/public/orig/52/05/52052A12ACE870C348D43B1AA652F7443AC7336AC8B1C283F354B1DE7D10FF21.zip
+    mv 52052A12ACE870C348D43B1AA652F7443AC7336AC8B1C283F354B1DE7D10FF21.zip sh_matching_data_udb_0_5.zip
+    unzip sh_matching_data_udb_0_5.zip
+    rm sh_matching_data_udb_0_5.zip
+    cd data_udb/
+    vsearch --makeudb_usearch sanger_refs_sh.fasta --output sanger_refs_sh.udb
+    rm sanger_refs_sh.fasta
+    vsearch --makeudb_usearch sanger_refs_sh_full.fasta --output sanger_refs_sh_full.udb
+    rm sanger_refs_sh_full.fasta
+    ```
+
 ## Running the analysis
 
 **NB! The script expects input files in FASTA format, named as source_[run_id] and placed in indata/ directory. Outdata files are described in [sh_matching_analysis/readme.txt](https://github.com/TU-NHM/sh_matching_pub/blob/master/sh_matching_analysis/readme.txt).**
 
-4. Run the pipeline using SIF (example data with run_id=11, region=itsfull[default]|its2, and itsx_step=yes[default]|no)
+5. Run the pipeline using SIF (example data with run_id=11, region=itsfull[default]|its2, and itsx_step=yes[default]|no)
     ```console
     ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes
     ```

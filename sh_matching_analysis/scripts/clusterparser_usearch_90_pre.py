@@ -81,10 +81,10 @@ with open (tmp_cl_file, "w") as cl, open(tmp_singl_file, "w") as singl, open(tmp
             with open(singl_file, "w") as s:
                 s.write(f">{cluster_seqs[0]}\n")
                 s.write(f"{original_seq_dict[cluster_seqs[0]]}\n")
-            singl.write(f"Singleton{row[0]}" + "\n")
+            singl.write(f"Singleton{row[0]}\n")
         else:
             cl_file = user_dir / "clusters_pre" / name_folder / "clusters" / f"Cluster{row[0]}"
             with open(cl_file, "w") as c:
                 for item in cluster_seqs:
                     c.write(f">{item}\n{original_seq_dict[item]}\n")
-            cl.write(f"Cluster{row[0]}" + "\n")
+            cl.write(f"Cluster{row[0]}\n")
