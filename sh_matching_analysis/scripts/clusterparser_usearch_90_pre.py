@@ -25,8 +25,8 @@ user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 file = user_dir / "clusters_pre" / "clusters_2_90.uc"
 tmp_file1 = user_dir / "clusters_out_2_90_pre.txt"
 tmp_file_nohits = user_dir / "iupac_out_vsearch.fasta"
-tmp_cl_file = user_dir / "clusters_pre" / name_folder / "tmp.txt"
-tmp_singl_file = user_dir / "clusters_pre" / name_folder / "singletons.txt"
+tmp_cl_file = user_dir / "clusters_pre" / "clusters" / name_folder / "tmp.txt"
+tmp_singl_file = user_dir / "clusters_pre" / "singletons" / name_folder / "singletons.txt"
 
 log_file = user_dir / f"err_{run_id}.log"
 logging.basicConfig(
