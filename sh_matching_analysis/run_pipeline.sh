@@ -447,10 +447,10 @@ zip source_"$run_id".zip matches/matches_out_*.csv matches/matches_out_*.html ma
 mv source_"$run_id".zip "$outdata_dir"/
 popd
 
-# ## clean user working dir
-# if [ -d "$user_dir" ]
-#   then
-#       rm -fr "$user_dir"
-# fi
+## clean user working dir
+if [ -d "$user_dir" ]
+  then
+    rm -fr "$user_dir"
+fi
 
 echo "End"

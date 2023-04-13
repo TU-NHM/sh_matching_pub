@@ -51,7 +51,7 @@ with open(reps_outfile, "w") as reps, open(seq_mappings_file, "a") as m:
             ucl_folder = row[0] + "_folder"
             folder_dir = user_dir / "clusters_pre" / "clusters" / ucl_folder
             if os.path.isdir(folder_dir):
-                glob_match_90 = f"{folder_dir}/Cluster*"
+                glob_match_90 = f"{folder_dir}/clusters/Cluster*"
                 file_list_90 = glob.glob(glob_match_90)
                 for file_90 in file_list_90:
                     ucl_code_90 = file_90.split("/")[-1]
@@ -70,7 +70,7 @@ with open(reps_outfile, "w") as reps, open(seq_mappings_file, "a") as m:
                                 reps.write(">" + rep_seqs + "\n" + str(iupac_full_seqs_dict[rep_seqs]) + "\n")
 
                 # process singletons folder here as well
-                glob_match_s_90 = f"{folder_dir}/clusters/singletons/Singleton*"
+                glob_match_s_90 = f"{folder_dir}/singletons/Singleton*"
                 file_list_s_90 = glob.glob(glob_match_s_90)
                 for file_s_90 in file_list_s_90:
                     ucl_code_90 = file_s_90.split("/")[-1]
