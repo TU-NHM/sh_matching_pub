@@ -26,7 +26,6 @@ log_file = user_dir / f"err_{run_id}.log"
 logging.basicConfig(
     filename=log_file, filemode="a", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level="INFO",
 )
-ex_file = user_dir / f"excluded_{run_id}.txt"
 
 seq_counter = 0
 disc_seq_counter = 0
