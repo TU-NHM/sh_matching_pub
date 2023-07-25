@@ -38,7 +38,7 @@ with open(infile_iupac, "r") as handle:
         iupac_full_seqs_dict[record.id] = record.seq
 
 # go through vsearch centroids file to create a new dataset of vsearch representatives
-with open(outfile, "w") as o, open(infile_centroids, "r") as handle:
+with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile_centroids, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
         if record.id in iupac_full_seqs_dict:
             seq_counter += 1
