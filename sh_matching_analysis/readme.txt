@@ -5,6 +5,13 @@ Description
 Developed as part of EOSC-Nordic (https://www.eosc-nordic.eu/) project (task 5.2.1: Cross-border data processing workflows), UNITE SH matching analysis is a digital service for the global species discovery from eDNA (environmental DNA). SH matching service is based on the UNITE (https://unite.ut.ee) datasets hosted in PlutoF (https://plutof.ut.ee). Its output includes information about what species are present in eDNA samples, are they potentially undescribed new species, where are they found in other studies, are they alien or threatened species, etc. The output will provide DOI (Digital Object Identifier) based stable identifiers for the communicating species found in eDNA. DOIs are connected to the taxonomic backbone of PlutoF and GBIF (https://www.gbif.org). In this way every DOI is accompanied by a taxon name which is still widely used for the communication of species. In the case of undescribed species, DOIs will soon be issued by the PlutoF system (only if SH matching service integrated with the PlutoF platform is used for the analysis). SH matching service covers all Eukaryota by using rDNA ITS marker sequences accompanied by sample metadata.
 
 
+Citing
+
+When using this resource, please cite as:
+
+Abarenkov K, Kõljalg U, Nilsson RH (2022) UNITE Species Hypotheses Matching Analysis. Biodiversity Information Science and Standards 6: e93856. https://doi.org/10.3897/biss.6.93856
+
+
 SH matching output
 
 Output archive includes the following files:
