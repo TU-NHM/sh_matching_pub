@@ -64,6 +64,12 @@ The script expects input files in FASTA format. Outdata files are described in [
     ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes
     ```
 
+## Citing
+
+When using this resource, please cite as:
+
+Abarenkov K, Kõljalg U, Nilsson RH (2022) UNITE Species Hypotheses Matching Analysis. Biodiversity Information Science and Standards 6: e93856. [https://doi.org/10.3897/biss.6.93856](https://doi.org/10.3897/biss.6.93856)
+
 ## Funding
 
 The work is supported by [EOSC-Nordic](https://eosc-nordic.eu/) and the Estonian Research Council grant (PRG1170).
