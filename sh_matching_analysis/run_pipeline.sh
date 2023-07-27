@@ -15,10 +15,15 @@ if [ -z "$1" ]
         exit
 fi
 
-## get run id, region, and whether to include ITSx step in the analysis
+## Retrieve the following parameters from positional arguments:
+## - 1. Run ID
+## - 2. ITS region (default, "itsfull"; alternatively, "its2")
+## - 3. Flag determining whether to include the ITSx step in the analysis (default, "yes")
+## - 4. Flag indicating whether to delete the user directory upon pipeline completion (default, "yes")
 run_id=$1
 region=$2
 itsx_step=$3
+remove_userdir=${4:-"yes"}
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Setting region to itsfull"
@@ -448,9 +453,11 @@ mv source_"$run_id".zip "$outdata_dir"/
 popd
 
 ## clean user working dir
-if [ -d "$user_dir" ]
-  then
+if [ "$remove_userdir" == "yes" -a -d "$user_dir" ]; then
+    echo "Removing user directory..."
     rm -fr "$user_dir"
+else
+    echo "Directory removal skipped"
 fi
 
 echo "End"
