@@ -163,25 +163,17 @@ rm "$user_dir/in_80_pre.fasta"
 
 ## create a list of useach clusters
 cd "$clusters_pre_dir/clusters/"
-touch "$clusters_pre_dir/tmp.txt"
-for nbr1 in {0..9}
-    do
-        if ls Cluster$nbr1 1> /dev/null 2>&1
-            then
-                ls Cluster$nbr1 >> "$clusters_pre_dir/tmp.txt"
-        fi
-    for nbr2 in {0..9}
-        do
-            if ls Cluster$nbr1$nbr2* 1> /dev/null 2>&1
-                then
-                    ls Cluster$nbr1$nbr2* >> "$clusters_pre_dir/tmp.txt"
-            fi
-        done
-    done
+find . -maxdepth 1 -type f -name "Cluster*" \
+    | sed 's|^./||' \
+    | sort --version-sort \
+    > "$clusters_pre_dir/tmp.txt"
 
 ## create a list of useach singletons
 cd "$clusters_pre_dir/singletons/"
-ls Singleton* > "$clusters_pre_dir/singletons.txt"
+find . -maxdepth 1 -type f -name "Singleton*" \
+    | sed 's|^./||' \
+    | sort --version-sort \
+    > "$clusters_pre_dir/singletons.txt"
 cd $pwd
 
 ## write vsearch clustering duplicates into duplic_seqs.txt file
