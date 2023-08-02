@@ -121,7 +121,7 @@ python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 ## Allow query sequences vary 4% in length at 100% similarity
 echo "Running vsearch 100% clustering"
 pushd $user_dir
-"$program_dir/vsearch/bin/vsearch" --cluster_fast "$user_dir/iupac_out_vsearch_96.fasta" --id 1 --iddef 0 --threads 8 --uc "$user_dir/clusters_100.uc" --centroids "$user_dir/centroids_100.fasta" --query_cov 0.96 --target_cov 0.96
+"$program_dir/vsearch/bin/vsearch" --cluster_fast "$user_dir/iupac_out_vsearch_96.fasta" --id 1 --iddef 2 --threads 8 --uc "$user_dir/clusters_100.uc" --centroids "$user_dir/centroids_100.fasta" --query_cov 0.96 --target_cov 0.96
 popd
 
 ## step in here with the vsearch representatives (the sequence count diff. is 9.5% for vsearch 4%)
