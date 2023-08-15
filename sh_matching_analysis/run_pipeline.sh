@@ -430,7 +430,7 @@ python3 $script_dir/shmatches2kronatext.py "$run_id" 025
 python3 $script_dir/shmatches2kronatext.py "$run_id" 03
 
 ## export PATH=$PATH:$PROTAX/thirdparty/krona/bin
-$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_01.html "$user_dir"/krona_005.txt
+$program_dir/krona/bin/ktImportText -o "$user_dir"/krona_005.html "$user_dir"/krona_005.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_01.html "$user_dir"/krona_01.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_015.html "$user_dir"/krona_015.txt
 $program_dir/krona/bin/ktImportText -o "$user_dir"/krona_02.html "$user_dir"/krona_02.txt
