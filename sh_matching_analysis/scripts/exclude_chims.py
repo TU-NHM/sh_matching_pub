@@ -72,9 +72,7 @@ with open(ex_file, "a") as ex, open(global_infile) as glob:
             perc_alignment_cov = len_alignment * 100 / len_of_query_cov
             perc_alignment_cov_target = len_alignment * 100 / len_of_target_cov
 
-            if perc_alignment_cov <= 80 and perc_alignment_cov_target <= 80:
-                global_chim_dict[row[0]] = 1
-            elif perc_alignment_cov <= 85 and perc_alignment_cov_target <= 85:
+            if perc_alignment_cov <= 85 and perc_alignment_cov_target <= 85:
                 global_chim_dict[row[0]] = 1
             elif int(row[3]) < len_limit_1 and int(row[7]) >= len_limit_1:
                 global_chim_dict[row[0]] = 1
