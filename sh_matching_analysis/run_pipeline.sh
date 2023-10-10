@@ -20,10 +20,12 @@ fi
 ## - 2. ITS region (default, "itsfull"; alternatively, "its2")
 ## - 3. Flag determining whether to include the ITSx step in the analysis (default, "yes")
 ## - 4. Flag indicating whether to delete the user directory upon pipeline completion (default, "yes")
+## - 5. Flag indicating whether to include the vsearch 100% clustering step with 96% length coverage (default, "yes")
 run_id=$1
 region=$2
 itsx_step=$3
 remove_userdir=${4:-"yes"}
+include_vsearch_step=${5:-"yes"}
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Setting region to itsfull"
@@ -119,9 +121,14 @@ python3 "$script_dir/exclude_chims.py" "$run_id" "$region"
 python3 "$script_dir/exclude_non_iupac.py" "$run_id" 6
 
 ## Allow query sequences vary 4% in length at 100% similarity
-echo "Running vsearch 100% clustering"
 pushd $user_dir
-"$program_dir/vsearch/bin/vsearch" --cluster_fast "$user_dir/iupac_out_vsearch_96.fasta" --id 1 --iddef 2 --threads 8 --uc "$user_dir/clusters_100.uc" --centroids "$user_dir/centroids_100.fasta" --query_cov 0.96 --target_cov 0.96
+if [ "$include_vsearch_step" == "yes" ]; then
+    echo "Running vsearch 100% clustering"
+    "$program_dir/vsearch/bin/vsearch" --cluster_fast "$user_dir/iupac_out_vsearch_96.fasta" --id 1 --iddef 2 --threads 8 --uc "$user_dir/clusters_100.uc" --centroids "$user_dir/centroids_100.fasta" --query_cov 0.96 --target_cov 0.96
+else
+    echo "Skipping the vsearch 100% clustering step with 96% length coverage"
+    "$program_dir/vsearch/bin/vsearch" --fastx_uniques "$user_dir/iupac_out_vsearch_96.fasta" --fastaout "$user_dir/centroids_100.fasta" --uc "$user_dir/clusters_100.uc"
+fi
 popd
 
 ## step in here with the vsearch representatives (the sequence count diff. is 9.5% for vsearch 4%)
