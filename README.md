@@ -59,9 +59,9 @@ The script expects input files in FASTA format. Outdata files are described in [
 
 **NB! The script expects input files in FASTA format, named as source_[run_id] and placed in indata/ directory. Outdata files are described in [sh_matching_analysis/readme.txt](https://github.com/TU-NHM/sh_matching_pub/blob/master/sh_matching_analysis/readme.txt).**
 
-5. Run the pipeline using SIF (example data with run_id=11, region=itsfull[default]|its2, and itsx_step=yes[default]|no)
+5. Run the pipeline using SIF (example data with run_id=11, region=itsfull[default]|its2, itsx_step=yes[default]|no, remove_userdir=yes[default]|no, include_vsearch_step=yes[default]|no)
     ```console
-    ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes
+    ./sh_matching.sif /sh_matching/run_pipeline.sh 11 itsfull yes yes no
     ```
 
 ## Citing
