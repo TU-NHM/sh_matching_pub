@@ -90,11 +90,11 @@ if [ "$itsx_step" == "yes" ]; then
     ## Extract ITS regions, first for fungi, and then all other groups.
     pushd "$user_dir"
     mkdir ITSx
-    perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --search_eval 0.1 -E 0.1 --graphical F --complement F
+    perl "$program_dir/ITSx/ITSx" -t F -i "$infile_new""unique" -o itsx_sh_out --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --search_eval 0.1 -E 0.1 --graphical F --complement T
     mv itsx_sh_out* ITSx/
 
     mkdir ITSx_o
-    perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --graphical F --complement F
+    perl "$program_dir/ITSx/ITSx" -t A,B,C,D,E,G,H,I,L,M,O,P,Q,R,S,T,U -i "$infile_new""unique" -o itsx_sh_out_o --cpu 8 --save_regions ITS1,5.8S,ITS2 --partial 50 --detailed_results T -concat T -preserve T -N 1 --graphical F --complement T
     mv itsx_sh_out_o* ITSx_o/
     popd
 
