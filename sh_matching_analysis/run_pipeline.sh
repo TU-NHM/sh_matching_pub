@@ -18,14 +18,16 @@ fi
 ## Retrieve the following parameters from positional arguments:
 ## - 1. Run ID
 ## - 2. ITS region (default, "itsfull"; alternatively, "its2")
-## - 3. Flag determining whether to include the ITSx step in the analysis (default, "yes")
+## - 3. Flag indicating whether to include the ITSx step in the analysis (default, "yes")
 ## - 4. Flag indicating whether to delete the user directory upon pipeline completion (default, "yes")
-## - 5. Flag indicating whether to include the vsearch 100% clustering step with 96% length coverage (default, "yes")
+## - 5. Flag indicating whether to include the vsearch substring dereplication (100% similarity clustering with 96% length coverage) step (default, "no")
+## - 6. Flag indicating whether to conduct the usearch complete-linkage clustering at 0.5% dissimilarity (default, "no")
 run_id=$1
 region=$2
 itsx_step=$3
 remove_userdir=${4:-"yes"}
-include_vsearch_step=${5:-"yes"}
+include_vsearch_step=${5:-"no"}
+include_usearch_05_step=${6:-"no"}
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Setting region to itsfull"
@@ -135,101 +137,105 @@ popd
 echo "Printing out vsearch representatives"
 python3 "$script_dir/select_vsearch_reps.py" "$run_id"
 
-## NEW: preclustering steps to keep only 0.5% representatives
+if [ "$include_usearch_05_step" == "yes" ]; then
+    ## NEW: preclustering steps to keep only 0.5% representatives
 
-## 1. usearch 97-95-90-80% clustering
-echo "usearch clustering"
-rm -fr $clusters_pre_dir
-mkdir $clusters_pre_dir
-mkdir "$clusters_pre_dir/clusters"
-mkdir "$clusters_pre_dir/singletons"
+    ## 1. usearch 97-95-90-80% clustering
+    echo "usearch clustering"
+    rm -fr $clusters_pre_dir
+    mkdir $clusters_pre_dir
+    mkdir "$clusters_pre_dir/clusters"
+    mkdir "$clusters_pre_dir/singletons"
 
-## 97% pre-clustering
-"$program_dir/usearch" -cluster_fast "$user_dir/iupac_out_vsearch.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_97_pre.uc"
-python3 "$script_dir/clusterparser_preclust1_pre.py" "$run_id"
+    ## 97% pre-clustering
+    "$program_dir/usearch" -cluster_fast "$user_dir/iupac_out_vsearch.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_97_pre.uc"
+    python3 "$script_dir/clusterparser_preclust1_pre.py" "$run_id"
 
-## 95% pre-clustering
-"$program_dir/usearch" -cluster_fast "$user_dir/in_95_pre.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_95_pre.uc"
-python3 "$script_dir/clusterparser_preclust2_pre.py" "$run_id"
+    ## 95% pre-clustering
+    "$program_dir/usearch" -cluster_fast "$user_dir/in_95_pre.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_95_pre.uc"
+    python3 "$script_dir/clusterparser_preclust2_pre.py" "$run_id"
 
-## 90% pre-clustering
-"$program_dir/usearch" -cluster_fast "$user_dir/in_90_pre.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_90_pre.uc"
-python3 "$script_dir/clusterparser_preclust3_pre.py" "$run_id"
+    ## 90% pre-clustering
+    "$program_dir/usearch" -cluster_fast "$user_dir/in_90_pre.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_90_pre.uc"
+    python3 "$script_dir/clusterparser_preclust3_pre.py" "$run_id"
 
-## 80% clustering
-"$program_dir/usearch" -cluster_fast "$user_dir/in_80_pre.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_80_pre.uc"
-python3 "$script_dir/clusterparser_preclust_final_pre.py" "$run_id"
+    ## 80% clustering
+    "$program_dir/usearch" -cluster_fast "$user_dir/in_80_pre.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_80_pre.uc"
+    python3 "$script_dir/clusterparser_preclust_final_pre.py" "$run_id"
 
-## remove unneeded uc, txt, and fasta files
-rm "$user_dir/clusters_97_pre.uc"
-rm "$user_dir/clusters_95_pre.uc"
-rm "$user_dir/clusters_90_pre.uc"
-rm "$user_dir/clusters_80_pre.uc"
-rm "$user_dir/clusters_out_97_pre.txt"
-rm "$user_dir/clusters_out_95_pre.txt"
-rm "$user_dir/clusters_out_90_pre.txt"
-rm "$user_dir/clusters_out_80_pre.txt"
-rm "$user_dir/in_95_pre.fasta"
-rm "$user_dir/in_90_pre.fasta"
-rm "$user_dir/in_80_pre.fasta"
+    ## remove unneeded uc, txt, and fasta files
+    rm "$user_dir/clusters_97_pre.uc"
+    rm "$user_dir/clusters_95_pre.uc"
+    rm "$user_dir/clusters_90_pre.uc"
+    rm "$user_dir/clusters_80_pre.uc"
+    rm "$user_dir/clusters_out_97_pre.txt"
+    rm "$user_dir/clusters_out_95_pre.txt"
+    rm "$user_dir/clusters_out_90_pre.txt"
+    rm "$user_dir/clusters_out_80_pre.txt"
+    rm "$user_dir/in_95_pre.fasta"
+    rm "$user_dir/in_90_pre.fasta"
+    rm "$user_dir/in_80_pre.fasta"
 
-## create a list of useach clusters
-cd "$clusters_pre_dir/clusters/"
-find . -maxdepth 1 -type f -name "Cluster*" \
-    | sed 's|^./||' \
-    | sort --version-sort \
-    > "$clusters_pre_dir/tmp.txt"
+    ## create a list of usearch clusters
+    cd "$clusters_pre_dir/clusters/"
+    find . -maxdepth 1 -type f -name "Cluster*" \
+        | sed 's|^./||' \
+        | sort --version-sort \
+        > "$clusters_pre_dir/tmp.txt"
 
-## create a list of useach singletons
-cd "$clusters_pre_dir/singletons/"
-find . -maxdepth 1 -type f -name "Singleton*" \
-    | sed 's|^./||' \
-    | sort --version-sort \
-    > "$clusters_pre_dir/singletons.txt"
-cd $pwd
+    ## create a list of usearch singletons
+    cd "$clusters_pre_dir/singletons/"
+    find . -maxdepth 1 -type f -name "Singleton*" \
+        | sed 's|^./||' \
+        | sort --version-sort \
+        > "$clusters_pre_dir/singletons.txt"
+    cd $pwd
 
-## write vsearch clustering duplicates into duplic_seqs.txt file
-python3 "$script_dir/usearch_parser.py" "$run_id"
+    ## write vsearch clustering duplicates into duplic_seqs.txt file
+    python3 "$script_dir/usearch_parser.py" "$run_id"
 
-## go through 80% uclust clusters and run 97% usearch clustering if needed (if >16000 in cluster size)
-## 2. calculate 0.5% clusters (USEARCH calc_distmx & cluster_aggd)
-touch "$user_dir/seq_mappings.txt"
-rm -fr "$clusters_pre_dir/clusters/calc_distm_out"
-mkdir "$clusters_pre_dir/clusters/calc_distm_out"
+    ## go through 80% uclust clusters and run 97% usearch clustering if needed (if >16000 in cluster size)
+    ## 2. calculate 0.5% clusters (USEARCH calc_distmx & cluster_aggd)
+    touch "$user_dir/seq_mappings.txt"
+    rm -fr "$clusters_pre_dir/clusters/calc_distm_out"
+    mkdir "$clusters_pre_dir/clusters/calc_distm_out"
 
-input_95="$clusters_pre_dir/tmp.txt"
-while IFS= read -r line
-do
-    fname="$clusters_pre_dir/clusters/$line"
-    if [ -f "$fname" ]
-        then
-            result=$(grep -c ">" "$fname")
-            if (( "$result" > "16000" ))
-                then
-                    echo "to be split:"$line":"$result
-                    "$program_dir/usearch" -cluster_fast $fname -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$clusters_pre_dir/clusters_2_90.uc"
-                    ## cluster into clusters_pre/ClusterX_folder/
-                    rm -fr "$clusters_pre_dir/clusters/"$line"_folder"
-                    mkdir "$clusters_pre_dir/clusters/"$line"_folder"
-                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/clusters"
-                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/singletons"
-                    ## parse usearch clusters
-                    python3 "$script_dir/clusterparser_usearch_90_pre.py" "$run_id" "$line"
-                    mkdir "$clusters_pre_dir/clusters/"$line"_folder/calc_distm_out"
+    input_95="$clusters_pre_dir/tmp.txt"
+    while IFS= read -r line
+    do
+        fname="$clusters_pre_dir/clusters/$line"
+        if [ -f "$fname" ]
+            then
+                result=$(grep -c ">" "$fname")
+                if (( "$result" > "16000" ))
+                    then
+                        echo "to be split:"$line":"$result
+                        "$program_dir/usearch" -cluster_fast $fname -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$clusters_pre_dir/clusters_2_90.uc"
+                        ## cluster into clusters_pre/ClusterX_folder/
+                        rm -fr "$clusters_pre_dir/clusters/"$line"_folder"
+                        mkdir "$clusters_pre_dir/clusters/"$line"_folder"
+                        mkdir "$clusters_pre_dir/clusters/"$line"_folder/clusters"
+                        mkdir "$clusters_pre_dir/clusters/"$line"_folder/singletons"
+                        ## parse usearch clusters
+                        python3 "$script_dir/clusterparser_usearch_90_pre.py" "$run_id" "$line"
+                        mkdir "$clusters_pre_dir/clusters/"$line"_folder/calc_distm_out"
+                        ## calculate usearch distance matrix
+                        python3 "$script_dir/calc_distm_formatter_90_pre.py" "$run_id" "$line"
+                else
+                    echo "sm:"$line":"$result
                     ## calculate usearch distance matrix
-                    python3 "$script_dir/calc_distm_formatter_90_pre.py" "$run_id" "$line"
-            else
-                echo "sm:"$line":"$result
-                ## calculate usearch distance matrix
-                python3 "$script_dir/calc_distm_formatter_80_pre.py" "$run_id" "$line"
-            fi
-    fi
-done < "$input_95"
+                    python3 "$script_dir/calc_distm_formatter_80_pre.py" "$run_id" "$line"
+                fi
+        fi
+    done < "$input_95"
 
-## 3. take 0.5% representatives as RepS, add USEARCH singletons
-python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
+    ## 3. take 0.5% representatives as RepS, add USEARCH singletons
+    python3 "$script_dir/select_core_reps_usearch.py" "$run_id"
 
-## END NEW: preclustering steps to keep only 0.5% representatives
+    ## END NEW: preclustering steps to keep only 0.5% representatives
+else
+    cp "$user_dir/iupac_out_vsearch.fasta" "$user_dir/core_reps_pre.fasta"
+fi
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
 pushd "$user_dir"
