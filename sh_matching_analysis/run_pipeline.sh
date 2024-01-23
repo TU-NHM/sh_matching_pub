@@ -20,14 +20,14 @@ fi
 ## - 2. ITS region (default, "itsfull"; alternatively, "its2")
 ## - 3. Flag indicating whether to include the ITSx step in the analysis (default, "yes")
 ## - 4. Flag indicating whether to delete the user directory upon pipeline completion (default, "yes")
-## - 5. Flag indicating whether to include the vsearch 100% clustering step with 96% length coverage (default, "yes")
-## - 6. Flag indicating whether to conduct the usearch 99.5% (complete-linkage) distance RepS clustering step (default, "yes")
+## - 5. Flag indicating whether to include the vsearch substring dereplication (100% similarity clustering with 96% length coverage) step (default, "no")
+## - 6. Flag indicating whether to conduct the usearch complete-linkage clustering at 0.5% dissimilarity (default, "no")
 run_id=$1
 region=$2
 itsx_step=$3
 remove_userdir=${4:-"yes"}
-include_vsearch_step=${5:-"yes"}
-include_usearch_05_step=${6:-"yes"}
+include_vsearch_step=${5:-"no"}
+include_usearch_05_step=${6:-"no"}
 
 if [ "$region" != "its2" ] && [ "$region" != "itsfull" ]; then
   echo "Setting region to itsfull"
@@ -176,14 +176,14 @@ if [ "$include_usearch_05_step" == "yes" ]; then
     rm "$user_dir/in_90_pre.fasta"
     rm "$user_dir/in_80_pre.fasta"
 
-    ## create a list of useach clusters
+    ## create a list of usearch clusters
     cd "$clusters_pre_dir/clusters/"
     find . -maxdepth 1 -type f -name "Cluster*" \
         | sed 's|^./||' \
         | sort --version-sort \
         > "$clusters_pre_dir/tmp.txt"
 
-    ## create a list of useach singletons
+    ## create a list of usearch singletons
     cd "$clusters_pre_dir/singletons/"
     find . -maxdepth 1 -type f -name "Singleton*" \
         | sed 's|^./||' \
