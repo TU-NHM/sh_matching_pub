@@ -262,9 +262,9 @@ for nbr1 in {0..9}
     do
         for nbr2 in {0..9}
             do
-                if ls UCL9_0$nbr1$nbr2* 1> /dev/null 2>&1
+                if ls UCL10_0$nbr1$nbr2* 1> /dev/null 2>&1
                     then
-                        ls UCL9_0$nbr1$nbr2* >> "$user_dir/compounds/tmp.txt"
+                        ls UCL10_0$nbr1$nbr2* >> "$user_dir/compounds/tmp.txt"
                 fi
             done
     done
