@@ -17,8 +17,6 @@ matches_dir = user_dir / "matches"
 infile = matches_dir / f"matches_out_all.csv"
 outfile = matches_dir / f"matches_out_taxonomy.csv"
 
-o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\n")
-
 with open(infile) as bh, open(outfile, "w") as o:
     # print header
     o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\n")
