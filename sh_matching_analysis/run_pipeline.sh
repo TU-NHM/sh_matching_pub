@@ -426,6 +426,9 @@ fi
 ## merge parse_matches*.pl output into one CSV file
 python3 $script_dir/merge_matches.py "$run_id"
 
+## return single common taxonomy based on the taxonomy information of SHs at 0.5-3.0% distance threshold and compound cluster
+python3 $script_dir/return_common_taxonomy.py "$run_id"
+
 ## parse matches for html output
 python3 $script_dir/parse_matches_html.py "$run_id" 005
 python3 $script_dir/parse_matches_html.py "$run_id" 01
