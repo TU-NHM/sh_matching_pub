@@ -14,12 +14,12 @@ if not run_id.isdigit():
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 matches_dir = user_dir / "matches"
-infile = matches_dir / f"matches_out_all.csv"
-outfile = matches_dir / f"matches_out_taxonomy.csv"
+infile = matches_dir / f"matches_out_all_v9.csv"
+outfile = matches_dir / f"matches_out_taxonomy_v9.csv"
 
 with open(infile) as bh, open(outfile, "w") as o:
     # print header
-    o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\n")
+    o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\t" + "common_rank" + "\n")
     dataReader = csv.reader(bh, delimiter="\t")
     row_ct = 0
     for row in dataReader:
@@ -231,11 +231,11 @@ with open(infile) as bh, open(outfile, "w") as o:
                     if conflict_flag == False:
                         # case-1. if 0.5% species present and higher taxa not in conflict with 1.0-3.0 level taxonomy:
                         #         -> use 0.5% taxonomy:species
-                        common_taxonomy = "case-1\t" + row[19]
+                        common_taxonomy = "case-1\t" + row[19] + "\t" + str(common_rank)
                     else:
                         # case-2. elif 0.5% species present but higher taxa in conflict with 1.0-3.0 level taxonomy:
                         #         -> use least common ancestor taxonomy
-                        common_taxonomy = "case-2\t" + common_anc_taxonomy
+                        common_taxonomy = "case-2\t" + common_anc_taxonomy + "\t" + str(common_rank)
             elif "gen" in th_taxonomy_dict[6]:
                 if len(check_gen_arr_05) == 1:
                     for item in th_taxonomy_dict:
@@ -303,11 +303,11 @@ with open(infile) as bh, open(outfile, "w") as o:
                     if conflict_flag == False:
                         # case-3. elif 0.5% genus present and higher taxa not in conflict with 1.0-3.0% level taxonomy:
                         #         -> use 0.5% taxonomy:genus
-                        common_taxonomy = "case-3\t" + common_anc_taxonomy
+                        common_taxonomy = "case-3\t" + common_anc_taxonomy + "\t" + str(common_rank)
                     else:
                         # case-4. elif 0.5% genus present and genus or higher taxa in conflict with 1.0-3.0% levels:
                         #         -> use least common ancestor taxonomy
-                        common_taxonomy = "case-4\t" + common_anc_taxonomy
+                        common_taxonomy = "case-4\t" + common_anc_taxonomy + "\t" + str(common_rank)
             else:
                 common_th_taxonomy_dict = {}
                 for item in th_taxonomy_dict:
@@ -405,7 +405,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                                         common_anc_taxonomy = common_anc_taxonomy + ";g__" + common_th_taxonomy_dict["gen"]
                 else:
                     common_anc_taxonomy = "k__Eukaryota_kgd_Incertae_sedis"
-                common_taxonomy = "case-5\t" + common_anc_taxonomy
+                common_taxonomy = "case-5\t" + common_anc_taxonomy + "\t" + str(common_rank)
             # case-6. if SH taxon name is on higher level than compound taxon name:
             #     -> use compound taxonomy instead
             compound_rank = 0
@@ -425,6 +425,6 @@ with open(infile) as bh, open(outfile, "w") as o:
                             compound_rank = 4
 
             if compound_rank > common_rank and conflict_flag == False:
-                common_taxonomy = "case-6\t" + compound_taxonomy
+                common_taxonomy = "case-6\t" + compound_taxonomy + "\t" + str(compound_rank)
             
             o.write(row[0] + "\t" + row[1] + "\t" + common_taxonomy + "\n")
