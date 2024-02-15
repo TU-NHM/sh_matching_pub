@@ -239,7 +239,7 @@ with open(infile) as bh, open(outfile, "w") as o:
             elif "gen" in th_taxonomy_dict[6]:
                 if len(check_gen_arr_05) == 1:
                     for item in th_taxonomy_dict:
-                        if len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
+                        if "kgd" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
                             if not th_taxonomy_dict[6]["kgd"] == th_taxonomy_dict[item]["kgd"]:
                                 conflict_flag = True
                     if conflict_flag == True:
@@ -250,7 +250,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = th_taxonomy_dict[6]["kgd"]
                         common_rank = 1
                         for item in th_taxonomy_dict:
-                            if len(th_taxonomy_dict[item]["phy"].split("_")) == 1:
+                            if "phy" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["phy"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["phy"] == th_taxonomy_dict[item]["phy"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
@@ -260,7 +260,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"]
                         common_rank = 2
                         for item in th_taxonomy_dict:
-                            if len(th_taxonomy_dict[item]["cls"].split("_")) == 1:
+                            if "cls" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["cls"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["cls"] == th_taxonomy_dict[item]["cls"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
@@ -270,7 +270,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"] + ";c__" + th_taxonomy_dict[6]["cls"]
                         common_rank = 3
                         for item in th_taxonomy_dict:
-                            if len(th_taxonomy_dict[item]["ord"].split("_")) == 1:
+                            if "ord" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["ord"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["ord"] == th_taxonomy_dict[item]["ord"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
@@ -280,7 +280,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"] + ";c__" + th_taxonomy_dict[6]["cls"] + ";o__" + th_taxonomy_dict[6]["ord"]
                         common_rank = 4
                         for item in th_taxonomy_dict:
-                            if len(th_taxonomy_dict[item]["fam"].split("_")) == 1:
+                            if "fam" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["fam"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["fam"] == th_taxonomy_dict[item]["fam"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
@@ -290,7 +290,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"] + ";c__" + th_taxonomy_dict[6]["cls"] + ";o__" + th_taxonomy_dict[6]["ord"] + ";f__" + th_taxonomy_dict[6]["fam"]
                         common_rank = 5
                         for item in th_taxonomy_dict:
-                            if len(th_taxonomy_dict[item]["gen"].split("_")) == 1:
+                            if "gen" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["gen"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["gen"] == th_taxonomy_dict[item]["gen"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
