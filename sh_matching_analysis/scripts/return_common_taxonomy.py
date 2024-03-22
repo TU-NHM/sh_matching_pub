@@ -14,8 +14,8 @@ if not run_id.isdigit():
 
 user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 matches_dir = user_dir / "matches"
-infile = matches_dir / f"matches_out_all_v9.csv"
-outfile = matches_dir / f"matches_out_taxonomy_v9.csv"
+infile = matches_dir / f"matches_out_all.csv"
+outfile = matches_dir / f"matches_out_taxonomy.csv"
 
 with open(infile) as bh, open(outfile, "w") as o:
     # print header
