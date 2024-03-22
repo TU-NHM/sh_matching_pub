@@ -391,7 +391,7 @@ with open(infile) as bh, open(outfile, "w") as o:
 
                 # case-5. else:
                 #     -> use least common ancestor taxonomy based on the taxonomy of 0.5-3.0% SHs
-                if "kgd" in common_th_taxonomy_dict and not common_th_taxonomy_dict["kgd"] == "unidentified" and not common_th_taxonomy_dict["kgd"] == "unspecified":
+                if "kgd" in common_th_taxonomy_dict and not common_th_taxonomy_dict["kgd"] == "unspecified":
                     common_anc_taxonomy = "k__" + common_th_taxonomy_dict["kgd"]
                     if "phy" in common_th_taxonomy_dict:
                         common_anc_taxonomy = common_anc_taxonomy + ";p__" + common_th_taxonomy_dict["phy"]
@@ -411,16 +411,16 @@ with open(infile) as bh, open(outfile, "w") as o:
             compound_rank = 0
             compound_taxonomy = ""
             compound_taxonomy_arr = row[21].split(";")
-            if compound_taxonomy_arr[0] and len(compound_taxonomy_arr[0][3:].split("_")) == 1 and not compound_taxonomy_arr[0] == "k__unidentified" and not compound_taxonomy_arr[0] == "k__unspecified":
+            if compound_taxonomy_arr[0] and len(compound_taxonomy_arr[0][3:].split("_")) == 1 and not compound_taxonomy_arr[0] == "k__unspecified":
                 compound_taxonomy = compound_taxonomy_arr[0]
                 compound_rank = 1
-                if compound_taxonomy_arr[1] and len(compound_taxonomy_arr[1][3:].split("_")) == 1 and not compound_taxonomy_arr[1] == "p__unidentified" and not compound_taxonomy_arr[1] == "p__unspecified":
+                if compound_taxonomy_arr[1] and len(compound_taxonomy_arr[1][3:].split("_")) == 1 and not compound_taxonomy_arr[1] == "p__unspecified":
                     compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[1]
                     compound_rank = 2
-                    if compound_taxonomy_arr[2] and len(compound_taxonomy_arr[2][3:].split("_")) == 1 and not compound_taxonomy_arr[2] == "c__unidentified" and not compound_taxonomy_arr[2] == "c__unspecified":
+                    if compound_taxonomy_arr[2] and len(compound_taxonomy_arr[2][3:].split("_")) == 1 and not compound_taxonomy_arr[2] == "c__unspecified":
                         compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[2]
                         compound_rank = 3
-                        if compound_taxonomy_arr[3] and len(compound_taxonomy_arr[3][3:].split("_")) == 1 and not compound_taxonomy_arr[3] == "o__unidentified" and not compound_taxonomy_arr[3] == "o__unspecified":
+                        if compound_taxonomy_arr[3] and len(compound_taxonomy_arr[3][3:].split("_")) == 1 and not compound_taxonomy_arr[3] == "o__unspecified":
                             compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[3]
                             compound_rank = 4
 
