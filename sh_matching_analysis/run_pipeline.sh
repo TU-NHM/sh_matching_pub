@@ -235,6 +235,7 @@ if [ "$include_usearch_05_step" == "yes" ]; then
     ## END NEW: preclustering steps to keep only 0.5% representatives
 else
     cp "$user_dir/iupac_out_vsearch.fasta" "$user_dir/core_reps_pre.fasta"
+    touch "$user_dir/duplic_seqs.txt"
 fi
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
