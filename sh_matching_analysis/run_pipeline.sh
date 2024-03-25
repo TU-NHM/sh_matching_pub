@@ -235,6 +235,7 @@ if [ "$include_usearch_05_step" == "yes" ]; then
     ## END NEW: preclustering steps to keep only 0.5% representatives
 else
     cp "$user_dir/iupac_out_vsearch.fasta" "$user_dir/core_reps_pre.fasta"
+    touch "$user_dir/duplic_seqs.txt"
 fi
 
 ## Find best matches to user’s sequences in the existing SH sequence dataset using usearch_global algorithm.
@@ -262,9 +263,9 @@ for nbr1 in {0..9}
     do
         for nbr2 in {0..9}
             do
-                if ls UCL9_0$nbr1$nbr2* 1> /dev/null 2>&1
+                if ls UCL10_0$nbr1$nbr2* 1> /dev/null 2>&1
                     then
-                        ls UCL9_0$nbr1$nbr2* >> "$user_dir/compounds/tmp.txt"
+                        ls UCL10_0$nbr1$nbr2* >> "$user_dir/compounds/tmp.txt"
                 fi
             done
     done
@@ -425,6 +426,9 @@ fi
 
 ## merge parse_matches*.pl output into one CSV file
 python3 $script_dir/merge_matches.py "$run_id"
+
+## return single common taxonomy based on the taxonomy information of SHs at 0.5-3.0% distance threshold and compound cluster
+python3 $script_dir/return_common_taxonomy.py "$run_id"
 
 ## parse matches for html output
 python3 $script_dir/parse_matches_html.py "$run_id" 005

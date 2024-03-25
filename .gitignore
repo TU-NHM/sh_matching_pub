@@ -9,4 +9,4 @@ sh_matching_analysis/scripts_initial_data/
 sh_matching_analysis/scripts/_*
 tmp/
 usearch11.0.667_i86linux32
-
+userdir/

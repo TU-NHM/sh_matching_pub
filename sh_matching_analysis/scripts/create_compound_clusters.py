@@ -58,7 +58,7 @@ with open(sh2compound_file) as sh2c:
         sh_ucl_dict[row["field_1"]] = row["field_2"]
 
 with open(compound2seq_file) as c2seq:
-    # UCL9_000001     1465615 CCCAT...     1327    SH1392229.09FU
+    # UCL10_000001     1465615 CCCAT...     1327    SH1392229.10FU
     dataReader_c2seq = csv.reader(c2seq, delimiter="\t")
     for row in dataReader_c2seq:
         new_name = f"i{row[1]}i"
