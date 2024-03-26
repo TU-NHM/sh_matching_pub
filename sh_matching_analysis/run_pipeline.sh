@@ -148,19 +148,19 @@ if [ "$include_usearch_05_step" == "yes" ]; then
     mkdir "$clusters_pre_dir/singletons"
 
     ## 97% pre-clustering
-    "$program_dir/usearch" -cluster_fast "$user_dir/iupac_out_vsearch.fasta" -id 0.97 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_97_pre.uc"
+    "$program_dir/vsearch/bin/vsearch" --cluster_smallmem "$user_dir/iupac_out_vsearch.fasta" --id 0.97 --gapopen 0I/0E --gapext 2I/1E --usersort --uc "$user_dir/clusters_97_pre.uc" --threads 8
     python3 "$script_dir/clusterparser_preclust1_pre.py" "$run_id"
 
     ## 95% pre-clustering
-    "$program_dir/usearch" -cluster_fast "$user_dir/in_95_pre.fasta" -id 0.95 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_95_pre.uc"
+    "$program_dir/vsearch/bin/vsearch" --cluster_smallmem "$user_dir/in_95_pre.fasta" --id 0.95 --gapopen 0I/0E --gapext 2I/1E --usersort --uc "$user_dir/clusters_95_pre.uc" --threads 8
     python3 "$script_dir/clusterparser_preclust2_pre.py" "$run_id"
 
     ## 90% pre-clustering
-    "$program_dir/usearch" -cluster_fast "$user_dir/in_90_pre.fasta" -id 0.90 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_90_pre.uc"
+    "$program_dir/vsearch/bin/vsearch" --cluster_smallmem "$user_dir/in_90_pre.fasta" --id 0.90 --gapopen 0I/0E --gapext 2I/1E --usersort --uc "$user_dir/clusters_90_pre.uc" --threads 8
     python3 "$script_dir/clusterparser_preclust3_pre.py" "$run_id"
 
     ## 80% clustering
-    "$program_dir/usearch" -cluster_fast "$user_dir/in_80_pre.fasta" -id 0.80 -gapopen 0.0/0.0E -gapext 1.0/0.5E -sort other -uc "$user_dir/clusters_80_pre.uc"
+    "$program_dir/vsearch/bin/vsearch" --cluster_smallmem "$user_dir/in_80_pre.fasta" --id 0.80 --gapopen 0I/0E --gapext 2I/1E --usersort --uc "$user_dir/clusters_80_pre.uc" --threads 8
     python3 "$script_dir/clusterparser_preclust_final_pre.py" "$run_id"
 
     ## remove unneeded uc, txt, and fasta files
