@@ -56,9 +56,9 @@ A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3
     perl install.pl --prefix ../krona
     cd /
 
-    # Get database files (https://api.plutof.ut.ee/v1/filerepository/files/6864700/)
-    wget https://s3.hpc.ut.ee/plutof-public/original/0f6cceb0-76fe-4de3-8db3-0beb950f1244.zip
-    mv 0f6cceb0-76fe-4de3-8db3-0beb950f1244.zip sh_matching_data_0_5.zip
+    # Get database files (https://app.plutof.ut.ee/filerepository/view/6868624)
+    wget https://s3.hpc.ut.ee/plutof-public/original/e69f715b-53a7-4a9d-b903-84965c1730c2.zip
+    mv e69f715b-53a7-4a9d-b903-84965c1730c2.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
 
