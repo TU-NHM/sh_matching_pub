@@ -166,16 +166,18 @@ logging.info(
 
 # read in no_detections.txt files for both runs and print out info about excluded sequences
 no_detect_f_set = set()
-with open (no_detect_file_f, "r") as det:
-    dataReader = csv.reader(det, delimiter="\t")
-    for row in dataReader:
-        no_detect_f_set.add(row[0])
+if no_detect_file_f.is_file():
+    with open (no_detect_file_f, "r") as det:
+        dataReader = csv.reader(det, delimiter="\t")
+        for row in dataReader:
+            no_detect_f_set.add(row[0])
 
-with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
-    dataReader = csv.reader(det, delimiter="\t")
-    for row in dataReader:
-        if row[0] in no_detect_f_set:
-            ex.write(f"{record_id}\tPRINT_FAS_O\tSequence not detected as ITS by ITSx.\n")
+if no_detect_file_o.is_file():
+    with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
+        dataReader = csv.reader(det, delimiter="\t")
+        for row in dataReader:
+            if row[0] in no_detect_f_set:
+                ex.write(f"{record_id}\tPRINT_FAS_O\tSequence not detected as ITS by ITSx.\n")
 
 logging.info(
     f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"
