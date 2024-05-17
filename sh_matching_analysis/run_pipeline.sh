@@ -41,6 +41,9 @@ if [ "$itsx_step" != "yes" ] && [ "$itsx_step" != "no" ]; then
 fi
 
 echo "ITSx - $itsx_step"
+echo "Remove userdir - $remove_userdir"
+echo "vsearch substring dereplication step - $include_vsearch_step"
+echo "usearch 0.5% pre-clustering step - $include_usearch_05_step"
 
 ## get working directory
 pwd=$(pwd)
