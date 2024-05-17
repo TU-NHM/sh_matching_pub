@@ -29,6 +29,8 @@ pos_file = itsx_dir / "itsx_sh_out.positions.txt"
 full_file = itsx_dir / "itsx_sh_out.full_and_partial.fasta"
 outfile = user_dir / "seqs_out_1.fasta"
 
+cov100_uniq_file = user_dir / f"source_{run_id}_fastanames"
+
 # Logging conf
 log_file = user_dir / f"err_{run_id}.log"
 logging.basicConfig(
@@ -44,6 +46,14 @@ full_counter = 0
 its2_counter = 0
 len_limit = 140
 ex_f_ct = 0
+
+# include info about duplicate sequences
+cov100_uniq_dict = {}
+with open(cov100_uniq_file, "r") as f:
+    dataReader = csv.reader(f, delimiter="\t")
+    for row in dataReader:
+        # include only those sequences where duplicates are present
+        cov100_uniq_dict[row[0]] = row[1]
 
 # read in ITS positions (to make sure that ITS1, 5.8S and ITS2 regions are all found, but may just be too short)
 # open excluded seq file
@@ -62,10 +72,10 @@ if region == "itsfull":
                     len_fields = row[1].split(" ")
                     length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
+                    ex.write(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
             else:
                 ex_f_ct += 1
-                logging.info(f"{row[0]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.")
+                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     len_limit = 100
     with open(ex_file, "a") as ex, open(pos_file) as pos:
@@ -80,10 +90,10 @@ elif region == "its2":
                     len_fields = row[1].split(" ")
                     length_dict[row[0]] = int(len_fields[0])
                 else:
-                    ex.write(f"{row[0]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
+                    ex.write(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
             else:
                 ex_f_ct += 1
-                logging.info(f"{row[0]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.\n")
+                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.\n")
 
 with open(full_file, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
@@ -109,8 +119,8 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile, "r") as han
                         o.write(f"{record.seq}\n")
                         its2_counter += 1
             else:
-                logging.info(f"PRINT_FAS\tSequence too short - {record_id}")
-                ex.write(f"{record_id}\tPRINT_FAS\tSequence too short.\n")
+                logging.info(f"PRINT_FAS\tSequence too short - {cov100_uniq_dict[record_id]}")
+                ex.write(f"{cov100_uniq_dict[record_id]}\tPRINT_FAS\tSequence too short.\n")
         else:
             no_coverage_count += 1
 
