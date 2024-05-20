@@ -81,27 +81,29 @@ while (<INFILE_DUPL>) {
 close INFILE_DUPL;
 
 # read in duplicate seqs 2
-open (INFILE_DUPL, $duplicate_seqs_file2);
-while (<INFILE_DUPL>) {
-    chomp $_;
-    my @fields = split(",", $_);
-    if (!defined($seq_duplicate_hash{$fields[0]})) {
-        if (defined($seq_duplicate_hash{$fields[1]})) {
-            $seq_duplicate_hash{$fields[0]} = $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
-            delete($seq_duplicate_hash{$fields[1]});
+if (-e $duplicate_seqs_file2) {
+    open (INFILE_DUPL, $duplicate_seqs_file2);
+    while (<INFILE_DUPL>) {
+        chomp $_;
+        my @fields = split(",", $_);
+        if (!defined($seq_duplicate_hash{$fields[0]})) {
+            if (defined($seq_duplicate_hash{$fields[1]})) {
+                $seq_duplicate_hash{$fields[0]} = $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
+                delete($seq_duplicate_hash{$fields[1]});
+            } else {
+                $seq_duplicate_hash{$fields[0]} = $fields[1];
+            }
         } else {
-            $seq_duplicate_hash{$fields[0]} = $fields[1];
-        }
-    } else {
-        if (defined($seq_duplicate_hash{$fields[1]})) {
-            $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
-            delete($seq_duplicate_hash{$fields[1]});
-        } else {
-            $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1];
+            if (defined($seq_duplicate_hash{$fields[1]})) {
+                $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1] . "," . $seq_duplicate_hash{$fields[1]};
+                delete($seq_duplicate_hash{$fields[1]});
+            } else {
+                $seq_duplicate_hash{$fields[0]} = $seq_duplicate_hash{$fields[0]} . "," . $fields[1];
+            }
         }
     }
+    close INFILE_DUPL;
 }
-close INFILE_DUPL;
 
 # read in sequence metadata from csv file
 my %seq_id_hash = ();

@@ -26,6 +26,8 @@ global_infile = user_dir / "usearch_global.full.75.blast6out.txt"
 infile = user_dir / "seqs_out.fasta"
 outfile = user_dir / "seqs_out_chim.fasta"
 
+cov100_uniq_file = user_dir / f"source_{run_id}_fastanames"
+
 # Logging conf
 log_file = user_dir / f"err_{run_id}.log"
 logging.basicConfig(
@@ -45,6 +47,14 @@ if region == "its2":
     len_limit_2 = 100
 
 global_chim_dict = {}
+
+# include info about duplicate sequences
+cov100_uniq_dict = {}
+with open(cov100_uniq_file, "r") as f:
+    dataReader = csv.reader(f, delimiter="\t")
+    for row in dataReader:
+        # include only those sequences where duplicates are present
+        cov100_uniq_dict[row[0]] = row[1]
 
 # open excluded seq file
 with open(ex_file, "a") as ex, open(global_infile) as glob:
@@ -77,7 +87,7 @@ with open(ex_file, "a") as ex, open(global_infile) as glob:
             elif int(row[3]) < len_limit_1 and int(row[7]) >= len_limit_1:
                 global_chim_dict[row[0]] = 1
         else:
-            logging.info(f"CHIM\tNOHIT_RECORD\t{row[0]}")
+            logging.info(f"CHIM\tNOHIT_RECORD\t{cov100_uniq_dict[row[0]]}")
             nohit_counter += 1
 
     logging.info(f"CHIM\tNo. of nohits: {nohit_counter}")
@@ -90,11 +100,11 @@ with open(ex_file, "a") as ex, open(global_infile) as glob:
                     o.write(f"{record.seq}\n")
                 else:
                     nogo_counter += 1
-                    logging.info(f"CHIM\tNOGO_RECORD\t{record.id}")
-                    ex.write(f"{record.id}\tCHIM\tSequence too short (<{len_limit_2} nucl).\n")
+                    logging.info(f"CHIM\tNOGO_RECORD\t{cov100_uniq_dict[record.id]}")
+                    ex.write(f"{cov100_uniq_dict[record.id]}\tCHIM\tSequence too short (<{len_limit_2} nucl).\n")
             else:
                 chim_counter += 1
-                logging.info(f"CHIM\tCHIM_RECORD\t{record.id}")
-                ex.write(f"{record.id}\tCHIM\tIdentified as chimeric based on the results of vsearch (usearch_global) chimera detection.\n")
+                logging.info(f"CHIM\tCHIM_RECORD\t{cov100_uniq_dict[record.id]}")
+                ex.write(f"{cov100_uniq_dict[record.id]}\tCHIM\tIdentified as chimeric based on the results of vsearch (usearch_global) chimera detection.\n")
 
     logging.info(f"CHIM\tNo go for {nogo_counter} (length) + {chim_counter} (chims) sequences.")

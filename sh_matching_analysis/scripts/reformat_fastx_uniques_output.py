@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import argparse
 import csv
+import logging
 import os
 from pathlib import Path
 
@@ -19,6 +20,11 @@ user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 infile = user_dir / f"source_{run_id}_fastauc"
 outfile = user_dir / f"source_{run_id}_fastanames"
 
+log_file = user_dir / f"err_{run_id}.log"
+logging.basicConfig(
+    filename=log_file, filemode="a", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level="INFO",
+)
+
 matches_dict = {}
 with open(infile, "r") as i:
     dataReader = csv.reader(i, delimiter="\t")
@@ -28,6 +34,10 @@ with open(infile, "r") as i:
         elif row[0] == "H":
             matches_dict[row[9]] = matches_dict[row[9]] + "," + row[8]
 
+uniq_ct = 0
 with open(outfile, "w") as o:
     for key in matches_dict:
+        uniq_ct += 1
         o.write(f"{key}\t{matches_dict[key]}\n")
+
+logging.info(f"FASTX_UNIQUES\tNumber of unique sequences: {uniq_ct}")

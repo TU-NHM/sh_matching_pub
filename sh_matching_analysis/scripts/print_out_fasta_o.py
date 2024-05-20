@@ -34,6 +34,8 @@ no_detect_file_f = itsx_dir_f / "itsx_sh_out_no_detections.txt"
 full_file = itsx_dir_o / "itsx_sh_out_o.full_and_partial.fasta"
 outfile = user_dir / "seqs_out_2.fasta"
 
+cov100_uniq_file = user_dir / f"source_{run_id}_fastanames"
+
 # Logging conf
 log_file = user_dir / f"err_{run_id}.log"
 logging.basicConfig(
@@ -52,6 +54,14 @@ full_counter = 0
 its2_counter = 0
 len_limit = 140
 ex_o_ct = 0
+
+# include info about duplicate sequences
+cov100_uniq_dict = {}
+with open(cov100_uniq_file, "r") as f:
+    dataReader = csv.reader(f, delimiter="\t")
+    for row in dataReader:
+        # include only those sequences where duplicates are present
+        cov100_uniq_dict[row[0]] = row[1]
 
 # read in ITS positions (to make sure that ITS1, 5.8S and ITS2 regions are all found, but may just be too short)
 if region == "itsfull":
@@ -103,10 +113,10 @@ if region == "itsfull":
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    logging.info(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
+                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
             else:
                 ex_o_ct += 1
-                logging.info(f"{row[0]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
+                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     with open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
@@ -120,10 +130,10 @@ elif region == "its2":
                     len_fields = row[1].split(" ")
                     new_length_dict[row[0]] = int(len_fields[0])
                 else:
-                    logging.info(f"{row[0]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
+                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
             else:
                 ex_o_ct += 1
-                logging.info(f"{row[0]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
+                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 
 # get ITS sequence from full file into hash
 with open(full_file, "r") as handle:
@@ -152,11 +162,11 @@ with open(ex_file, "a") as ex, open(outfile, "w") as o, open(infile_o, "r") as h
                             o.write(f"{record.seq}\n")
                             its2_counter += 1
                 else:
-                    logging.info(f"PRINT_FAS_O\tSequence too short - {record_id}")
-                    ex.write(f"{record_id}\tPRINT_FAS_O\tSequence too short.\n")
+                    logging.info(f"PRINT_FAS_O\tSequence too short - {cov100_uniq_dict[record_id]}")
+                    ex.write(f"{cov100_uniq_dict[record_id]}\tPRINT_FAS_O\tSequence too short.\n")
             else:
                 no_coverage_count += 1
-                ex.write(f"{record_id}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.\n")
+                ex.write(f"{cov100_uniq_dict[record_id]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.\n")
 
 logging.info(f"PRINT_FAS_O\tNo coverage for {no_coverage_count} sequences.")
 logging.info(
@@ -166,16 +176,18 @@ logging.info(
 
 # read in no_detections.txt files for both runs and print out info about excluded sequences
 no_detect_f_set = set()
-with open (no_detect_file_f, "r") as det:
-    dataReader = csv.reader(det, delimiter="\t")
-    for row in dataReader:
-        no_detect_f_set.add(row[0])
+if no_detect_file_f.is_file():
+    with open (no_detect_file_f, "r") as det:
+        dataReader = csv.reader(det, delimiter="\t")
+        for row in dataReader:
+            no_detect_f_set.add(row[0])
 
-with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
-    dataReader = csv.reader(det, delimiter="\t")
-    for row in dataReader:
-        if row[0] in no_detect_f_set:
-            ex.write(f"{record_id}\tPRINT_FAS_O\tSequence not detected as ITS by ITSx.\n")
+if no_detect_file_o.is_file():
+    with open(ex_file, "a") as ex, open (no_detect_file_o, "r") as det:
+        dataReader = csv.reader(det, delimiter="\t")
+        for row in dataReader:
+            if row[0] in no_detect_f_set:
+                ex.write(f"{cov100_uniq_dict[record_id]}\tPRINT_FAS_O\tSequence not detected as ITS by ITSx.\n")
 
 logging.info(
     f"No of seqs (other) excluded (no ITS1 or ITS2 region detected): {ex_o_ct}"

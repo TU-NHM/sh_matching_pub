@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 from pathlib import Path
 
@@ -18,11 +19,20 @@ infile = user_dir / f"source_{run_id}"
 fasta_file = user_dir / f"source_{run_id}_fasta"
 names_file = user_dir / f"source_{run_id}_names"
 
+log_file = user_dir / f"err_{run_id}.log"
+logging.basicConfig(
+    filename=log_file, filemode="a", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level="INFO",
+)
+
+seq_ct = 0
 with open(infile, "r") as handle, open(fasta_file, "w") as f, open(names_file, "w") as n:
     for counter, record in enumerate(SeqIO.parse(handle, "fasta"), start=1):
+        seq_ct += 1
         new_id = f"{run_id}_{counter}"
 
         f.write(f">i{new_id}i\n")
         f.write(f"{record.seq}\n")
 
         n.write(f"{record.id}\ti{new_id}i\t1\n")
+
+logging.info(f"START\tNumber of sequences to start with: {seq_ct}")
