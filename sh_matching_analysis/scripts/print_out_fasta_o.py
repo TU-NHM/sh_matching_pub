@@ -69,27 +69,31 @@ if region == "itsfull":
         # TODO - csv.DictReader possibility
         dataReader_pos = csv.reader(pos, delimiter="\t")
         for row in dataReader_pos:
-            if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-                chim_match = re.search("Chimeric!", row[7])
-                part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
-                no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
-                too_long_match = re.search("ITS region too long!", row[7])
-                if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
-                    positions_dict[row[0]] = 1
-                    len_fields = row[1].split(" ")
-                    length_dict[row[0]] = int(len_fields[0])
+            # some ITSx related bug to be reported to Johan
+            if not row[0] == "--END--":
+                if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                    chim_match = re.search("Chimeric!", row[7])
+                    part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
+                    no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
+                    too_long_match = re.search("ITS region too long!", row[7])
+                    if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
+                        positions_dict[row[0]] = 1
+                        len_fields = row[1].split(" ")
+                        length_dict[row[0]] = int(len_fields[0])
 elif region == "its2":
     len_limit = 100
     with open(pos_file_f) as pos:
         dataReader_pos = csv.reader(pos, delimiter="\t")
         for row in dataReader_pos:
-            if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-                chim_match = re.search("Chimeric!", row[7])
-                too_long_match = re.search("ITS region too long!", row[7])
-                if not chim_match and not too_long_match:
-                    positions_dict[row[0]] = 1
-                    len_fields = row[1].split(" ")
-                    length_dict[row[0]] = int(len_fields[0])
+            # some ITSx related bug to be reported to Johan?
+            if not row[0] == "--END--":
+                if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                    chim_match = re.search("Chimeric!", row[7])
+                    too_long_match = re.search("ITS region too long!", row[7])
+                    if not chim_match and not too_long_match:
+                        positions_dict[row[0]] = 1
+                        len_fields = row[1].split(" ")
+                        length_dict[row[0]] = int(len_fields[0])
 
 with open(infile_f, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
@@ -103,37 +107,41 @@ if region == "itsfull":
         # TODO - csv.DictReader possibility
         dataReader_pos_o = csv.reader(pos_o, delimiter="\t")
         for row in dataReader_pos_o:
-            if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-                chim_match = re.search("Chimeric!", row[7])
-                part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
-                no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
-                too_long_match = re.search("ITS region too long!", row[7])
-                if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
-                    new_positions_dict[row[0]] = 1
-                    len_fields = row[1].split(" ")
-                    new_length_dict[row[0]] = int(len_fields[0])
+            # some ITSx related bug to be reported to Johan?
+            if not row[0] == "--END--":
+                if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                    chim_match = re.search("Chimeric!", row[7])
+                    part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
+                    no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
+                    too_long_match = re.search("ITS region too long!", row[7])
+                    if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
+                        new_positions_dict[row[0]] = 1
+                        len_fields = row[1].split(" ")
+                        new_length_dict[row[0]] = int(len_fields[0])
+                    else:
+                        logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
                 else:
-                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
-            else:
-                ex_o_ct += 1
-                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
+                    ex_o_ct += 1
+                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     with open(pos_file_o) as pos_o:
         # TODO - csv.DictReader possibility
         dataReader_pos_o = csv.reader(pos_o, delimiter="\t")
         for row in dataReader_pos_o:
-            if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-                chim_match = re.search("Chimeric!", row[7])
-                too_long_match = re.search("ITS region too long!", row[7])
-                if not chim_match and not too_long_match:
-                    new_positions_dict[row[0]] = 1
-                    len_fields = row[1].split(" ")
-                    new_length_dict[row[0]] = int(len_fields[0])
+            # some ITSx related bug to be reported to Johan?
+            if not row[0] == "--END--":
+                if not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                    chim_match = re.search("Chimeric!", row[7])
+                    too_long_match = re.search("ITS region too long!", row[7])
+                    if not chim_match and not too_long_match:
+                        new_positions_dict[row[0]] = 1
+                        len_fields = row[1].split(" ")
+                        new_length_dict[row[0]] = int(len_fields[0])
+                    else:
+                        logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
                 else:
-                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tChimeric or broken sequence according to ITSx.")
-            else:
-                ex_o_ct += 1
-                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
+                    ex_o_ct += 1
+                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS_O\tITS1 or ITS2 sequence not detected.")
 
 # get ITS sequence from full file into hash
 with open(full_file, "r") as handle:
