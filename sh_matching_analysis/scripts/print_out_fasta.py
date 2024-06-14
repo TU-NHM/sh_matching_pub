@@ -62,20 +62,22 @@ if region == "itsfull":
         # TODO - csv.DictReader would be nice
         dataReader_pos = csv.reader(pos, delimiter="\t")
         for row in dataReader_pos:
-            if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
-                chim_match = re.search("Chimeric!", row[7])
-                part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
-                no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
-                too_long_match = re.search("ITS region too long!", row[7])
-                if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
-                    positions_dict[row[0]] = 1
-                    len_fields = row[1].split(" ")
-                    length_dict[row[0]] = int(len_fields[0])
+            # some ITSx related bug to be reported to Johan
+            if not row[0] == "--END--":
+                if not row[3] == "ITS1: Not found" and not row[5] == "ITS2: Not found" and not row[5] == "ITS2: No start" and not row[5] == "ITS2: No end":
+                    chim_match = re.search("Chimeric!", row[7])
+                    part_58S_match = re.search("Broken or partial sequence, only partial 5.8S!", row[7])
+                    no_58S_match = re.search("Broken or partial sequence, no 5.8S!", row[7])
+                    too_long_match = re.search("ITS region too long!", row[7])
+                    if not chim_match and not part_58S_match and not no_58S_match and not too_long_match:
+                        positions_dict[row[0]] = 1
+                        len_fields = row[1].split(" ")
+                        length_dict[row[0]] = int(len_fields[0])
+                    else:
+                        ex.write(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
                 else:
-                    ex.write(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tChimeric or broken sequence according to ITSx.\n")
-            else:
-                ex_f_ct += 1
-                logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.")
+                    ex_f_ct += 1
+                    logging.info(f"{cov100_uniq_dict[row[0]]}\tPRINT_FAS\tITS1 or ITS2 sequence not detected.")
 elif region == "its2":
     len_limit = 100
     with open(ex_file, "a") as ex, open(pos_file) as pos:
