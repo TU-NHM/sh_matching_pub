@@ -1,10 +1,10 @@
 # A base Ubuntu 20 Singularity container with basic Python packages
 
 BootStrap: library
-From: ubuntu:20.04
+From: ubuntu:22.04
 
 %help
-A base Ubuntu 20 Singularity container with basic Python packages such as HMMER3 and biopython
+A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3 and biopython
 
 %post
     # Some package only available in "universe" repo
