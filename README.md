@@ -42,10 +42,10 @@ The script expects input files in FASTA format. Outdata files are described in [
     mkdir outdata
     ```
 
-4. Download FASTA dbs (https://app.plutof.ut.ee/filerepository/view/7442782) and create UDB formatted dbs
+4. Download FASTA dbs (https://app.plutof.ut.ee/filerepository/view/7502694) and create UDB formatted dbs
     ```console
-    wget https://s3.hpc.ut.ee/plutof-public/original/4edb5b07-945d-44c5-86cb-3c7b935f02e0.zip
-    mv 4edb5b07-945d-44c5-86cb-3c7b935f02e0.zip sh_matching_data_udb_0_5.zip
+    wget https://s3.hpc.ut.ee/plutof-public/original/5eba59a4-8c8d-4364-8da6-58676df02474.zip
+    mv 5eba59a4-8c8d-4364-8da6-58676df02474.zip sh_matching_data_udb_0_5.zip
     unzip sh_matching_data_udb_0_5.zip
     rm sh_matching_data_udb_0_5.zip
     cd data_udb/
