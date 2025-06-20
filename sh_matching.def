@@ -1,4 +1,4 @@
-# A base Ubuntu 20 Singularity container with basic Python packages
+# A base Ubuntu 22 Singularity container with basic Python packages
 
 BootStrap: library
 From: ubuntu:22.04
@@ -56,9 +56,9 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     perl install.pl --prefix ../krona
     cd /
 
-    # Get database files (https://app.plutof.ut.ee/filerepository/view/7414635)
-    wget https://s3.hpc.ut.ee/plutof-public/original/fc513ab4-beba-48f7-9cba-71968fe108b5.zip
-    mv fc513ab4-beba-48f7-9cba-71968fe108b5.zip sh_matching_data_0_5.zip
+    # Get database files
+    wget https://s3.hpc.ut.ee/plutof-public/original/2c44bb87-46fc-4fad-b64a-6d02658c64d4.zip
+    mv 2c44bb87-46fc-4fad-b64a-6d02658c64d4.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
 
