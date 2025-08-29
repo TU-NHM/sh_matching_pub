@@ -188,7 +188,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"]
                         common_rank = 2
                         for item in th_taxonomy_dict:
-                            if "csl" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["cls"].split("_")) == 1:
+                            if "cls" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["cls"].split("_")) == 1:
                                 if not th_taxonomy_dict[6]["cls"] == th_taxonomy_dict[item]["cls"]:
                                     conflict_flag = True
                         # if conflict_flag == True:
