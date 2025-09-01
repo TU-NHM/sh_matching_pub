@@ -15,7 +15,7 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     apt update
     apt upgrade -y
 
-    apt install -y python3  # Python 3.8
+    apt install -y python3  # Python 3.10
     apt install -y python3-pip
     apt install -y zip
     apt install -y unzip
@@ -25,16 +25,14 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     mkdir -p /sh_matching/programs/
 
     # biopython
-    pip3 install --no-cache-dir --upgrade biopython==1.79
+    pip3 install --no-cache-dir --upgrade biopython==1.85
 
     # usearch 11.0.667
-    wget https://www.drive5.com/downloads/usearch11.0.667_i86linux32.gz
-    gunzip usearch11.0.667_i86linux32.gz
-    mv usearch11.0.667_i86linux32 /sh_matching/programs/usearch
+    wget https://raw.githubusercontent.com/rcedgar/usearch_old_binaries/refs/heads/main/bin/usearch11.0.667_i86linux64
+    mv usearch11.0.667_i86linux64 /sh_matching/programs/usearch
     chmod 0111 /sh_matching/programs/usearch
 
-    # vsearch 2.22.1
-    # apt install -y vsearch=2.22.1
+    # vsearch
     wget https://github.com/torognes/vsearch/releases/download/v2.30.0/vsearch-2.30.0-linux-x86_64.tar.gz
     tar -xvf vsearch-2.30.0-linux-x86_64.tar.gz -C /sh_matching/programs/
     mv /sh_matching/programs/vsearch-2.30.0-linux-x86_64 /sh_matching/programs/vsearch
