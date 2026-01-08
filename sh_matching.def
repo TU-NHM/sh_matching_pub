@@ -33,10 +33,10 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     chmod 0111 /sh_matching/programs/usearch
 
     # vsearch
-    wget https://github.com/torognes/vsearch/releases/download/v2.30.0/vsearch-2.30.0-linux-x86_64.tar.gz
-    tar -xvf vsearch-2.30.0-linux-x86_64.tar.gz -C /sh_matching/programs/
-    mv /sh_matching/programs/vsearch-2.30.0-linux-x86_64 /sh_matching/programs/vsearch
-    rm vsearch-2.30.0-linux-x86_64.tar.gz
+    wget https://github.com/torognes/vsearch/releases/download/v2.30.2/vsearch-2.30.2-linux-x86_64.tar.gz
+    tar -xvf vsearch-2.30.2-linux-x86_64.tar.gz -C /sh_matching/programs/
+    mv /sh_matching/programs/vsearch-2.30.2-linux-x86_64 /sh_matching/programs/vsearch
+    rm vsearch-2.30.2-linux-x86_64.tar.gz
 
     # ITSx 1.1.3
     wget https://microbiology.se/sw/ITSx_1.1.3.tar.gz
@@ -55,8 +55,8 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     cd /
 
     # Get database files
-    wget https://s3.hpc.ut.ee/plutof-public/original/2c44bb87-46fc-4fad-b64a-6d02658c64d4.zip
-    mv 2c44bb87-46fc-4fad-b64a-6d02658c64d4.zip sh_matching_data_0_5.zip
+    wget https://s3.hpc.ut.ee/plutof-public/original/6f704df1-9d19-40a9-8ce5-ea301c7a8c7c.zip
+    mv 6f704df1-9d19-40a9-8ce5-ea301c7a8c7c.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
 

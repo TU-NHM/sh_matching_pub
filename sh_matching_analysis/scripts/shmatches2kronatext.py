@@ -95,23 +95,23 @@ with open(outfile, "w") as o, open(matches_file) as m:
                                                     seq_taxon_count[tax_name_s] = 1
                                 else:
                                     # special case for new SHs where compound taxonomy should be parsed
-                                    tax_name_f = taxa_dict[0] + ";" + taxa_dict[1] + ";" + taxa_dict[2] + ";" + taxa_dict[3] + ";f__unspecified"
-                                    if "f__unspecified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]:
+                                    tax_name_f = taxa_dict[0] + ";" + taxa_dict[1] + ";" + taxa_dict[2] + ";" + taxa_dict[3] + ";f__unclassified"
+                                    if "f__unclassified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]:
                                         seq_taxon_count[tax_name_f] += 1
                                     else:
-                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unspecified"] = {}
+                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unclassified"] = {}
                                         seq_taxon_count[tax_name_f] = 1
-                                    tax_name_g = tax_name_f + ";g__unspecified"
-                                    if "g__unspecified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unspecified"]:
+                                    tax_name_g = tax_name_f + ";g__unclassified"
+                                    if "g__unclassified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unclassified"]:
                                         seq_taxon_count[tax_name_g] += 1
                                     else:
-                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unspecified"]["g__unspecified"] = {}
+                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unclassified"]["g__unclassified"] = {}
                                         seq_taxon_count[tax_name_g] = 1
-                                    tax_name_s = tax_name_g + ";s__unspecified"
-                                    if "s__unspecified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unspecified"]["g__unspecified"]:
+                                    tax_name_s = tax_name_g + ";s__unclassified"
+                                    if "s__unclassified" in seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unclassified"]["g__unclassified"]:
                                         seq_taxon_count[tax_name_s] += 1
                                     else:
-                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unspecified"]["g__unspecified"]["s__unspecified"] = 1
+                                        seq_taxonomy_dict[taxa_dict[0]][taxa_dict[1]][taxa_dict[2]][taxa_dict[3]]["f__unclassified"]["g__unclassified"]["s__unclassified"] = 1
                                         seq_taxon_count[tax_name_s] = 1
     # taxonomy tab
     for kgd in seq_taxonomy_dict:

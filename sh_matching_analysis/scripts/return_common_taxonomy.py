@@ -19,7 +19,7 @@ outfile = matches_dir / f"matches_out_taxonomy.csv"
 
 with open(infile) as bh, open(outfile, "w") as o:
     # print header
-    o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\t" + "common_rank" + "\n")
+    o.write("seq_id" + "\t" + "seq_name" + "\t" + "common_name_selection_status" + "\t" + "common_taxonomy" + "\t" + "common_rank" + "\t" + "matched_sequence" + "\t" + "similarity_percentage" + "\n")
     dataReader = csv.reader(bh, delimiter="\t")
     row_ct = 0
     for row in dataReader:
@@ -63,103 +63,103 @@ with open(infile) as bh, open(outfile, "w") as o:
 
             lineage_05_arr = row[19].split(";")
             check_sp_arr_05 = None
-            if len(lineage_05_arr) == 7 and not lineage_05_arr[6] == "s__unspecified":
+            if len(lineage_05_arr) == 7 and not lineage_05_arr[6] == "s__unclassified":
                 check_sp_arr_05 = lineage_05_arr[6][3:].split("_")
                 if not check_sp_arr_05[-1] == "sp":
                     th_taxonomy_dict[6]["spe"] = lineage_05_arr[6][3:]
-            if len(lineage_05_arr) > 5 and not lineage_05_arr[5] == "g__unspecified":
+            if len(lineage_05_arr) > 5 and not lineage_05_arr[5] == "g__unclassified":
                 check_gen_arr_05 = lineage_05_arr[5][3:].split("_")
                 if len(check_gen_arr_05) == 1:
                     th_taxonomy_dict[6]["gen"] = lineage_05_arr[5][3:]
-            if len(lineage_05_arr) > 4 and not lineage_05_arr[4] == "f__unspecified":
+            if len(lineage_05_arr) > 4 and not lineage_05_arr[4] == "f__unclassified":
                 th_taxonomy_dict[6]["fam"] = lineage_05_arr[4][3:]
-            if len(lineage_05_arr) > 3 and not lineage_05_arr[3] == "o__unspecified":
+            if len(lineage_05_arr) > 3 and not lineage_05_arr[3] == "o__unclassified":
                 th_taxonomy_dict[6]["ord"] = lineage_05_arr[3][3:]
-            if len(lineage_05_arr) > 2 and not lineage_05_arr[2] == "c__unspecified":
+            if len(lineage_05_arr) > 2 and not lineage_05_arr[2] == "c__unclassified":
                 th_taxonomy_dict[6]["cls"] = lineage_05_arr[2][3:]
-            if len(lineage_05_arr) > 1 and not lineage_05_arr[1] == "p__unspecified":
+            if len(lineage_05_arr) > 1 and not lineage_05_arr[1] == "p__unclassified":
                 th_taxonomy_dict[6]["phy"] = lineage_05_arr[1][3:]
-            if len(lineage_05_arr) > 0 and not lineage_05_arr[0] == "k__unspecified":
+            if len(lineage_05_arr) > 0 and not lineage_05_arr[0] == "k__unclassified":
                 th_taxonomy_dict[6]["kgd"] = lineage_05_arr[0][3:]
             
             lineage_10_arr = row[16].split(";")
-            if len(lineage_10_arr) == 7 and not lineage_10_arr[6] == "s__unspecified":
+            if len(lineage_10_arr) == 7 and not lineage_10_arr[6] == "s__unclassified":
                 th_taxonomy_dict[3]["spe"] = lineage_10_arr[6][3:]
-            if len(lineage_10_arr) > 5 and not lineage_10_arr[5] == "g__unspecified":
+            if len(lineage_10_arr) > 5 and not lineage_10_arr[5] == "g__unclassified":
                 th_taxonomy_dict[3]["gen"] = lineage_10_arr[5][3:]
-            if len(lineage_10_arr) > 4 and not lineage_10_arr[4] == "f__unspecified":
+            if len(lineage_10_arr) > 4 and not lineage_10_arr[4] == "f__unclassified":
                 th_taxonomy_dict[3]["fam"] = lineage_10_arr[4][3:]
-            if len(lineage_10_arr) > 3 and not lineage_10_arr[3] == "o__unspecified":
+            if len(lineage_10_arr) > 3 and not lineage_10_arr[3] == "o__unclassified":
                 th_taxonomy_dict[3]["ord"] = lineage_10_arr[3][3:]
-            if len(lineage_10_arr) > 2 and not lineage_10_arr[2] == "c__unspecified":
+            if len(lineage_10_arr) > 2 and not lineage_10_arr[2] == "c__unclassified":
                 th_taxonomy_dict[3]["cls"] = lineage_10_arr[2][3:]
-            if len(lineage_10_arr) > 1 and not lineage_10_arr[1] == "p__unspecified":
+            if len(lineage_10_arr) > 1 and not lineage_10_arr[1] == "p__unclassified":
                 th_taxonomy_dict[3]["phy"] = lineage_10_arr[1][3:]
-            if len(lineage_10_arr) > 0 and not lineage_10_arr[0] == "k__unspecified":
+            if len(lineage_10_arr) > 0 and not lineage_10_arr[0] == "k__unclassified":
                 th_taxonomy_dict[3]["kgd"] = lineage_10_arr[0][3:]
 
             lineage_15_arr = row[13].split(";")
-            if len(lineage_15_arr) == 7 and not lineage_15_arr[6] == "s__unspecified":
+            if len(lineage_15_arr) == 7 and not lineage_15_arr[6] == "s__unclassified":
                 th_taxonomy_dict[5]["spe"] = lineage_15_arr[6][3:]
-            if len(lineage_15_arr) > 5 and not lineage_15_arr[5] == "g__unspecified":
+            if len(lineage_15_arr) > 5 and not lineage_15_arr[5] == "g__unclassified":
                 th_taxonomy_dict[5]["gen"] = lineage_15_arr[5][3:]
-            if len(lineage_15_arr) > 4 and not lineage_15_arr[4] == "f__unspecified":
+            if len(lineage_15_arr) > 4 and not lineage_15_arr[4] == "f__unclassified":
                 th_taxonomy_dict[5]["fam"] = lineage_15_arr[4][3:]
-            if len(lineage_15_arr) > 3 and not lineage_15_arr[3] == "o__unspecified":
+            if len(lineage_15_arr) > 3 and not lineage_15_arr[3] == "o__unclassified":
                 th_taxonomy_dict[5]["ord"] = lineage_15_arr[3][3:]
-            if len(lineage_15_arr) > 2 and not lineage_15_arr[2] == "c__unspecified":
+            if len(lineage_15_arr) > 2 and not lineage_15_arr[2] == "c__unclassified":
                 th_taxonomy_dict[5]["cls"] = lineage_15_arr[2][3:]
-            if len(lineage_15_arr) > 1 and not lineage_15_arr[1] == "p__unspecified":
+            if len(lineage_15_arr) > 1 and not lineage_15_arr[1] == "p__unclassified":
                 th_taxonomy_dict[5]["phy"] = lineage_15_arr[1][3:]
-            if len(lineage_15_arr) > 0 and not lineage_15_arr[0] == "k__unspecified":
+            if len(lineage_15_arr) > 0 and not lineage_15_arr[0] == "k__unclassified":
                 th_taxonomy_dict[5]["kgd"] = lineage_15_arr[0][3:]
 
             lineage_20_arr = row[10].split(";")
-            if len(lineage_20_arr) == 7 and not lineage_20_arr[6] == "s__unspecified":
+            if len(lineage_20_arr) == 7 and not lineage_20_arr[6] == "s__unclassified":
                 th_taxonomy_dict[2]["spe"] = lineage_20_arr[6][3:]
-            if len(lineage_20_arr) > 5 and not lineage_20_arr[5] == "g__unspecified":
+            if len(lineage_20_arr) > 5 and not lineage_20_arr[5] == "g__unclassified":
                 th_taxonomy_dict[2]["gen"] = lineage_20_arr[5][3:]
-            if len(lineage_20_arr) > 4 and not lineage_20_arr[4] == "f__unspecified":
+            if len(lineage_20_arr) > 4 and not lineage_20_arr[4] == "f__unclassified":
                 th_taxonomy_dict[2]["fam"] = lineage_20_arr[4][3:]
-            if len(lineage_20_arr) > 3 and not lineage_20_arr[3] == "o__unspecified":
+            if len(lineage_20_arr) > 3 and not lineage_20_arr[3] == "o__unclassified":
                 th_taxonomy_dict[2]["ord"] = lineage_20_arr[3][3:]
-            if len(lineage_20_arr) > 2 and not lineage_20_arr[2] == "c__unspecified":
+            if len(lineage_20_arr) > 2 and not lineage_20_arr[2] == "c__unclassified":
                 th_taxonomy_dict[2]["cls"] = lineage_20_arr[2][3:]
-            if len(lineage_20_arr) > 1 and not lineage_20_arr[1] == "p__unspecified":
+            if len(lineage_20_arr) > 1 and not lineage_20_arr[1] == "p__unclassified":
                 th_taxonomy_dict[2]["phy"] = lineage_20_arr[1][3:]
-            if len(lineage_20_arr) > 0 and not lineage_20_arr[0] == "k__unspecified":
+            if len(lineage_20_arr) > 0 and not lineage_20_arr[0] == "k__unclassified":
                 th_taxonomy_dict[2]["kgd"] = lineage_20_arr[0][3:]
             
             lineage_25_arr = row[7].split(";")
-            if len(lineage_25_arr) == 7 and not lineage_25_arr[6] == "s__unspecified":
+            if len(lineage_25_arr) == 7 and not lineage_25_arr[6] == "s__unclassified":
                 th_taxonomy_dict[4]["spe"] = lineage_25_arr[6][3:]
-            if len(lineage_25_arr) > 5 and not lineage_25_arr[5] == "g__unspecified":
+            if len(lineage_25_arr) > 5 and not lineage_25_arr[5] == "g__unclassified":
                 th_taxonomy_dict[4]["gen"] = lineage_25_arr[5][3:]
-            if len(lineage_25_arr) > 4 and not lineage_25_arr[4] == "f__unspecified":
+            if len(lineage_25_arr) > 4 and not lineage_25_arr[4] == "f__unclassified":
                 th_taxonomy_dict[4]["fam"] = lineage_25_arr[4][3:]
-            if len(lineage_25_arr) > 3 and not lineage_25_arr[3] == "o__unspecified":
+            if len(lineage_25_arr) > 3 and not lineage_25_arr[3] == "o__unclassified":
                 th_taxonomy_dict[4]["ord"] = lineage_25_arr[3][3:]
-            if len(lineage_25_arr) > 2 and not lineage_25_arr[2] == "c__unspecified":
+            if len(lineage_25_arr) > 2 and not lineage_25_arr[2] == "c__unclassified":
                 th_taxonomy_dict[4]["cls"] = lineage_25_arr[2][3:]
-            if len(lineage_25_arr) > 1 and not lineage_25_arr[1] == "p__unspecified":
+            if len(lineage_25_arr) > 1 and not lineage_25_arr[1] == "p__unclassified":
                 th_taxonomy_dict[4]["phy"] = lineage_25_arr[1][3:]
-            if len(lineage_25_arr) > 0 and not lineage_25_arr[0] == "k__unspecified":
+            if len(lineage_25_arr) > 0 and not lineage_25_arr[0] == "k__unclassified":
                 th_taxonomy_dict[4]["kgd"] = lineage_25_arr[0][3:]
             
             lineage_30_arr = row[4].split(";")
-            if len(lineage_30_arr) == 7 and not lineage_30_arr[6] == "s__unspecified":
+            if len(lineage_30_arr) == 7 and not lineage_30_arr[6] == "s__unclassified":
                 th_taxonomy_dict[1]["spe"] = lineage_30_arr[6][3:]
-            if len(lineage_30_arr) > 5 and not lineage_30_arr[5] == "g__unspecified":
+            if len(lineage_30_arr) > 5 and not lineage_30_arr[5] == "g__unclassified":
                 th_taxonomy_dict[1]["gen"] = lineage_30_arr[5][3:]
-            if len(lineage_30_arr) > 4 and not lineage_30_arr[4] == "f__unspecified":
+            if len(lineage_30_arr) > 4 and not lineage_30_arr[4] == "f__unclassified":
                 th_taxonomy_dict[1]["fam"] = lineage_30_arr[4][3:]
-            if len(lineage_30_arr) > 3 and not lineage_30_arr[3] == "o__unspecified":
+            if len(lineage_30_arr) > 3 and not lineage_30_arr[3] == "o__unclassified":
                 th_taxonomy_dict[1]["ord"] = lineage_30_arr[3][3:]
-            if len(lineage_30_arr) > 2 and not lineage_30_arr[2] == "c__unspecified":
+            if len(lineage_30_arr) > 2 and not lineage_30_arr[2] == "c__unclassified":
                 th_taxonomy_dict[1]["cls"] = lineage_30_arr[2][3:]
-            if len(lineage_30_arr) > 1 and not lineage_30_arr[1] == "p__unspecified":
+            if len(lineage_30_arr) > 1 and not lineage_30_arr[1] == "p__unclassified":
                 th_taxonomy_dict[1]["phy"] = lineage_30_arr[1][3:]
-            if len(lineage_30_arr) > 0 and not lineage_30_arr[0] == "k__unspecified":
+            if len(lineage_30_arr) > 0 and not lineage_30_arr[0] == "k__unclassified":
                 th_taxonomy_dict[1]["kgd"] = lineage_30_arr[0][3:]
             
             conflict_flag = False
@@ -175,7 +175,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__Eukaryota_kgd_Incertae_sedis"
 
                     if conflict_flag == False:
-                        common_anc_taxonomy = th_taxonomy_dict[6]["kgd"]
+                        common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"]
                         common_rank = 1
                         for item in th_taxonomy_dict:
                             if "phy" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["phy"].split("_")) == 1:
@@ -226,11 +226,12 @@ with open(infile) as bh, open(outfile, "w") as o:
 
                     if conflict_flag == False:
                         common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"] + ";p__" + th_taxonomy_dict[6]["phy"] + ";c__" + th_taxonomy_dict[6]["cls"] + ";o__" + th_taxonomy_dict[6]["ord"] + ";f__" + th_taxonomy_dict[6]["fam"] + ";g__" + th_taxonomy_dict[6]["gen"]
-                        common_rank = 6
+                        common_rank = 7
                         
                     if conflict_flag == False:
                         # case-1. if 0.5% species present and higher taxa not in conflict with 1.0-3.0 level taxonomy:
                         #         -> use 0.5% taxonomy:species
+                        common_rank = 7
                         common_taxonomy = "case-1\t" + row[19] + "\t" + str(common_rank)
                     else:
                         # case-2. elif 0.5% species present but higher taxa in conflict with 1.0-3.0 level taxonomy:
@@ -247,7 +248,7 @@ with open(infile) as bh, open(outfile, "w") as o:
                         common_anc_taxonomy = "k__Eukaryota_kgd_Incertae_sedis"
 
                     if conflict_flag == False:
-                        common_anc_taxonomy = th_taxonomy_dict[6]["kgd"]
+                        common_anc_taxonomy = "k__" + th_taxonomy_dict[6]["kgd"]
                         common_rank = 1
                         for item in th_taxonomy_dict:
                             if "phy" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["phy"].split("_")) == 1:
@@ -391,7 +392,7 @@ with open(infile) as bh, open(outfile, "w") as o:
 
                 # case-5. else:
                 #     -> use least common ancestor taxonomy based on the taxonomy of 0.5-3.0% SHs
-                if "kgd" in common_th_taxonomy_dict and not common_th_taxonomy_dict["kgd"] == "unspecified":
+                if "kgd" in common_th_taxonomy_dict and not common_th_taxonomy_dict["kgd"] == "unclassified":
                     common_anc_taxonomy = "k__" + common_th_taxonomy_dict["kgd"]
                     if "phy" in common_th_taxonomy_dict:
                         common_anc_taxonomy = common_anc_taxonomy + ";p__" + common_th_taxonomy_dict["phy"]
@@ -411,20 +412,20 @@ with open(infile) as bh, open(outfile, "w") as o:
             compound_rank = 0
             compound_taxonomy = ""
             compound_taxonomy_arr = row[21].split(";")
-            if compound_taxonomy_arr[0] and len(compound_taxonomy_arr[0][3:].split("_")) == 1 and not compound_taxonomy_arr[0] == "k__unspecified":
+            if compound_taxonomy_arr[0] and len(compound_taxonomy_arr[0][3:].split("_")) == 1 and not compound_taxonomy_arr[0] == "k__unclassified":
                 compound_taxonomy = compound_taxonomy_arr[0]
                 compound_rank = 1
-                if compound_taxonomy_arr[1] and len(compound_taxonomy_arr[1][3:].split("_")) == 1 and not compound_taxonomy_arr[1] == "p__unspecified":
+                if compound_taxonomy_arr[1] and len(compound_taxonomy_arr[1][3:].split("_")) == 1 and not compound_taxonomy_arr[1] == "p__unclassified":
                     compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[1]
                     compound_rank = 2
-                    if compound_taxonomy_arr[2] and len(compound_taxonomy_arr[2][3:].split("_")) == 1 and not compound_taxonomy_arr[2] == "c__unspecified":
+                    if compound_taxonomy_arr[2] and len(compound_taxonomy_arr[2][3:].split("_")) == 1 and not compound_taxonomy_arr[2] == "c__unclassified":
                         compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[2]
                         compound_rank = 3
-                        if compound_taxonomy_arr[3] and len(compound_taxonomy_arr[3][3:].split("_")) == 1 and not compound_taxonomy_arr[3] == "o__unspecified":
+                        if compound_taxonomy_arr[3] and len(compound_taxonomy_arr[3][3:].split("_")) == 1 and not compound_taxonomy_arr[3] == "o__unclassified":
                             compound_taxonomy = compound_taxonomy + ";" + compound_taxonomy_arr[3]
                             compound_rank = 4
 
             if compound_rank > common_rank and conflict_flag == False:
                 common_taxonomy = "case-6\t" + compound_taxonomy + "\t" + str(compound_rank)
             
-            o.write(row[0] + "\t" + row[1] + "\t" + common_taxonomy + "\n")
+            o.write(row[0] + "\t" + row[1] + "\t" + common_taxonomy + "\t" + row[22] + "\t" + row[23] + "\n")
