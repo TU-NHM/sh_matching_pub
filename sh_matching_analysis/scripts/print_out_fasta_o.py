@@ -26,7 +26,8 @@ user_dir = Path(f"{os.getcwd()}/userdir/{run_id}")
 itsx_dir_o = user_dir / "ITSx_o"
 itsx_dir_f = user_dir / "ITSx"
 infile_o = itsx_dir_o / "itsx_sh_out_o.ITS2.full_and_partial.fasta"
-infile_f = itsx_dir_f / "itsx_sh_out.ITS2.full_and_partial.fasta"
+# infile_f = itsx_dir_f / "itsx_sh_out.ITS2.full_and_partial.fasta"
+infile_f = user_dir / "seqs_out_1.fasta"
 pos_file_o = itsx_dir_o / "itsx_sh_out_o.positions.txt"
 pos_file_f = itsx_dir_f / "itsx_sh_out.positions.txt"
 no_detect_file_o = itsx_dir_o / "itsx_sh_out_o_no_detections.txt"
@@ -97,9 +98,13 @@ elif region == "its2":
 
 with open(infile_f, "r") as handle:
     for record in SeqIO.parse(handle, "fasta"):
+        # name = record.id
+        # name_fields = name.split("|")
+        # fungi_dict[name_fields[0]] = 1
         name = record.id
         name_fields = name.split("|")
         fungi_dict[name_fields[0]] = 1
+        fungi_dict[str(record.id)] = 1
 
 # open excluded seq file
 if region == "itsfull":
