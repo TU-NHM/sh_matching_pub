@@ -101,9 +101,6 @@ with open(infile_f, "r") as handle:
         # name = record.id
         # name_fields = name.split("|")
         # fungi_dict[name_fields[0]] = 1
-        name = record.id
-        name_fields = name.split("|")
-        fungi_dict[name_fields[0]] = 1
         fungi_dict[str(record.id)] = 1
 
 # open excluded seq file
