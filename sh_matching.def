@@ -55,8 +55,8 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     cd /
 
     # Get database files
-    wget https://s3.hpc.ut.ee/plutof-public/original/6f704df1-9d19-40a9-8ce5-ea301c7a8c7c.zip
-    mv 6f704df1-9d19-40a9-8ce5-ea301c7a8c7c.zip sh_matching_data_0_5.zip
+    wget https://s3.hpc.ut.ee/plutof-public/original/1884d5c1-5b6a-4f73-a0ca-a20a83268c26.zip
+    mv 1884d5c1-5b6a-4f73-a0ca-a20a83268c26.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
 
