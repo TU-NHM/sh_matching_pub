@@ -167,9 +167,10 @@ with open(infile) as bh, open(outfile, "w") as o:
             if "spe" in th_taxonomy_dict[6]:
                 if not check_sp_arr_05[-1] == "sp":
                     for item in th_taxonomy_dict:
-                        if len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
-                            if not th_taxonomy_dict[6]["kgd"] == th_taxonomy_dict[item]["kgd"]:
-                                conflict_flag = True
+                        if th_taxonomy_dict[item]:
+                            if len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
+                                if not th_taxonomy_dict[6]["kgd"] == th_taxonomy_dict[item]["kgd"]:
+                                    conflict_flag = True
                     if conflict_flag == True:
                         # common_anc_taxonomy = "k__conflict_on_kgd_level"
                         common_anc_taxonomy = "k__Eukaryota_kgd_Incertae_sedis"
@@ -240,9 +241,10 @@ with open(infile) as bh, open(outfile, "w") as o:
             elif "gen" in th_taxonomy_dict[6]:
                 if len(check_gen_arr_05) == 1:
                     for item in th_taxonomy_dict:
-                        if "kgd" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
-                            if not th_taxonomy_dict[6]["kgd"] == th_taxonomy_dict[item]["kgd"]:
-                                conflict_flag = True
+                        if th_taxonomy_dict[item]:
+                            if "kgd" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
+                                if not th_taxonomy_dict[6]["kgd"] == th_taxonomy_dict[item]["kgd"]:
+                                    conflict_flag = True
                     if conflict_flag == True:
                         # common_anc_taxonomy = "k__conflict_on_kgd_level"
                         common_anc_taxonomy = "k__Eukaryota_kgd_Incertae_sedis"
@@ -312,12 +314,13 @@ with open(infile) as bh, open(outfile, "w") as o:
             else:
                 common_th_taxonomy_dict = {}
                 for item in th_taxonomy_dict:
-                    if "kgd" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
-                        if "kgd" in common_th_taxonomy_dict:
-                            if not common_th_taxonomy_dict["kgd"] == th_taxonomy_dict[item]["kgd"]:
-                                conflict_flag = True
-                        else:
-                            common_th_taxonomy_dict["kgd"] = th_taxonomy_dict[item]["kgd"]
+                    if th_taxonomy_dict[item]:
+                        if "kgd" in th_taxonomy_dict[item] and len(th_taxonomy_dict[item]["kgd"].split("_")) == 1:
+                            if "kgd" in common_th_taxonomy_dict:
+                                if not common_th_taxonomy_dict["kgd"] == th_taxonomy_dict[item]["kgd"]:
+                                    conflict_flag = True
+                            else:
+                                common_th_taxonomy_dict["kgd"] = th_taxonomy_dict[item]["kgd"]
                 if conflict_flag == True:
                     del common_th_taxonomy_dict["kgd"]
 
