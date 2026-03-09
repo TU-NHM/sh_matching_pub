@@ -21,13 +21,15 @@ The script expects input files in FASTA format. Outdata files are described in [
 
 ### Pre-requisites
 
-* [Singularity](https://sylabs.io/singularity/) - install Singularity (tested with version 3.5) and obtain API key for remote build
+* [Lima](https://github.com/lima-vm/lima) - for running Linux virtual machine (to Mac users)
+* [Apptainer](https://apptainer.org/) - (formerly Singularity) for creating the container
 
 ### Setup steps
 
-1. Create Singularity Image File (SIF)
+1. Start apptainer and create the container
     ```console
-    sudo singularity build sh_matching.sif sh_matching.def
+    limactl shell apptainer
+    apptainer build sh_matching.sif sh_maching.def
     ```
 
 2. OPTIONAL: Copy SIF to HPC

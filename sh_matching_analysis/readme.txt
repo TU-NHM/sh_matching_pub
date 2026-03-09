@@ -14,15 +14,15 @@ Abarenkov K, Kõljalg U, Nilsson RH (2022) UNITE Species Hypotheses Matching Ana
 
 SH matching output
 
-Output archive includes the following files:
+The output archive includes the following files:
 
-1. matches/ directory - folder including the main output files describing user's dataset matches to existing SHs, new compound clusters and SHs and HTML output
-	a. matches_out_[distance_threshold].csv - data matrix describing user's sequences belonging to existing SHs or forming new SHs. These only include sequences which were placed into existing compound clusters;
-	b. matches_1_out_[distance_threshold].csv - data matrix describing user's sequences splitting into new SHs. These include sequences placed outside of the current SH system and existing compound clusters. These sequences should be critically reviewed because they often include large proportion of chimeric and/or low quality sequences;
-	c. matches_out_[distance_threshold].html - HTML output summarizing the data in matches CSV files.
-	d. matches_out_all.txt - data matrix describing user's sequences belonging to existing SHs or forming new SHs (all distance thresholds merged). These include both sequences which were placed into existing compound clusters and sequences forming new compound clusters;
-2. err_[run_id].log - info and error messages in different analysis steps, mostly for debugging and providing support;
-3. excluded_[run_id].txt - list of sequences excluded from the analysis with the reason why they were included;
-4. source_[run_id]_names - translation table between user's sequence identifiers and system internal identifiers used throughout the analysis;
-5. source_[run_id]_fastanames - list of duplicate sequences in user's input data;
-6. krona_03.html - Krona HTML file krona_03.html can be interactively visualized with web browser. Piechart shows all those taxonomic units for which there is taxonomic information from matching SHs and compound clusters.
+1. matches/ directory - a folder containing the main output files describing matches between the user's dataset and existing SHs, as well as newly formed compound clusters and SHs, and an HTML summary.
+    a. matches_out_[distance_threshold].csv - a data matrix describing the user's sequences assigned to existing SHs or forming new SHs.
+    b. matches_out_[distance_threshold].html - an HTML summary of the data contained in the corresponding CSV files.
+    c. matches_out_all.txt - a data matrix describing the user's sequences assigned to existing SHs or forming new SHs, with all distance thresholds merged.
+    d. maches_out_taxonomy.csv - a list of query sequences with consensus taxonomy, taking into account the taxonomy of SHs across all distance thresholds.
+2. err_[run_id].log - information and error messages from different analysis steps, mainly intended for debugging and support;
+3. excluded_[run_id].txt - a list of sequences excluded from the analysis, along with the reasons for their exclusion;
+4. source_[run_id]_names - a translation table between the user's sequence identifiers and the internal system identifiers used throughout the analysis;
+5. source_[run_id]_fastanames - a list of duplicate sequences found in the user's input data;
+6. krona_03.html - a Krona HTML file that can be interactively visualized in a web browser. The pie chart shows all taxonomic units for which taxonomic information is available from matching SHs and compound clusters.
