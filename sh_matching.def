@@ -1,26 +1,28 @@
 # A base Ubuntu 22 Singularity container with basic Python packages
 
-BootStrap: library
+BootStrap: docker
 From: ubuntu:22.04
 
 %help
 A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3 and biopython
 
 %post
+    set -e
+
     # Some package only available in "universe" repo
-    apt update -y
-    apt install -y software-properties-common
+    apt-get update -y
+    apt-get install -y software-properties-common
     add-apt-repository universe
 
     apt update
     apt upgrade -y
 
-    apt install -y python3  # Python 3.10
-    apt install -y python3-pip
-    apt install -y zip
-    apt install -y unzip
-    apt install -y hmmer
-    apt install -y wget
+    apt-get install -y python3  # Python 3.10
+    apt-get install -y python3-pip
+    apt-get install -y zip
+    apt-get install -y unzip
+    apt-get install -y hmmer
+    apt-get install -y wget
 
     mkdir -p /sh_matching/programs/
 
@@ -59,6 +61,9 @@ A base Ubuntu 22 Singularity container with basic Python packages such as HMMER3
     mv 4cbcab49-cf73-416b-8251-42fa3d83e92a.zip sh_matching_data_0_5.zip
     unzip sh_matching_data_0_5.zip -d /sh_matching/
     rm sh_matching_data_0_5.zip
+
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
 
 %environment
     export LC_ALL=C
