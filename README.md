@@ -29,7 +29,7 @@ The script expects input files in FASTA format. Outdata files are described in [
 1. Start apptainer and create the container
     ```console
     limactl shell apptainer
-    apptainer build sh_matching.sif sh_maching.def
+    apptainer build sh_matching.sif sh_matching.def
     ```
 
 2. OPTIONAL: Copy SIF to HPC
@@ -44,10 +44,10 @@ The script expects input files in FASTA format. Outdata files are described in [
     mkdir outdata
     ```
 
-4. Download FASTA dbs (https://app.plutof.ut.ee/filerepository/view/8135714) and create UDB formatted dbs
+4. Download FASTA dbs (https://app.plutof.ut.ee/filerepository/view/8239625) and create UDB formatted dbs
     ```console
-    wget https://s3.hpc.ut.ee/plutof-public/original/b4e6594e-c4bc-42b7-a4c6-8286e8b73943.zip
-    mv b4e6594e-c4bc-42b7-a4c6-8286e8b73943.zip sh_matching_data_udb_0_5.zip
+    wget https://s3.hpc.ut.ee/plutof-public/original/ba63ec6b-0014-4816-805c-0def4c07dc71.zip
+    mv ba63ec6b-0014-4816-805c-0def4c07dc71.zip sh_matching_data_udb_0_5.zip
     unzip sh_matching_data_udb_0_5.zip
     rm sh_matching_data_udb_0_5.zip
     cd data_udb/
